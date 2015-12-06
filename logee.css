@@ -1,18 +1,18 @@
 /* ========================================================================
  * logee.css v0.0.1
- * https://github.com/nem035/logee.css
+ * https://github.com/nem035/logee.js
  * ========================================================================
  * Copyright 2015 Nemanja Stojanovic
  * Licensed under MIT (https://github.com/nem035/logee.js/blob/master/LICENSE)
  * ======================================================================== */
 
- .__logee {
-	position: fixed;
-	z-index: 2147483647; /* max z index */
+ .__logee-container {
 	background: #37474f;
 	color: #eceff1;
 	border: 1px solid #263238;
 	border-radius: 3px;
+	position: fixed;
+	z-index: 2147483647; /* max z index */
 	opacity: 0.9;	
 }
 
@@ -20,18 +20,18 @@
 	border: 1px dashed #eceff1;
 }
 
-.__logee-head {
+.__logee-container .__logee-head {
+	border-bottom: 1px solid #263238;
 	padding: 2px;
 	font-size: 1.2em;
 	font-weight: bold;
-	border-bottom: 1px solid #263238;
 	box-shadow: 0px 2px 10px 0px #263238;
 	cursor: move;
-	font-family: 'Rockwell Extra Bold', 'Rockwell Bold', monospace;
 	font-size: 1em;
+	font-family: 'Rockwell Extra Bold', 'Rockwell Bold', monospace;
 }
 
-.__logee-clear-btn {
+.__logee-container .__logee-head .__logee-clear-btn {
 	background: #eceff1;
 	color: #263238;
 	border: 1px solid #263238;
@@ -40,77 +40,78 @@
 	cursor: pointer;
 }
 
-.__logee-clear-btn:hover {
+.__logee-container .__logee-head .__logee-clear-btn:hover {
 	opacity: 0.85;	
 }
 
-.__logee-clear-btn:focus {
+.__logee-container .__logee-head .__logee-clear-btn:focus {
 	outline: none;	
 }
 
-.__logee-body {
-	overflow-y: scroll;
+.__logee-container .__logee-body {
 	box-shadow: inset 2px 2px 10px 3px  #263238;
+	overflow-y: scroll;
 	font-family: monospace;
 }
 
-.__logee-msg {
+.__logee-container .__logee-body .__logee-msg {
 	border-bottom: 1px solid #455a64;
 	padding: 5px;	
 	overflow-x: scroll;
 	opacity: 0;
-  	transition: opacity 0.15s linear;
+  transition: opacity 0.15s linear;
 }
 
-.__logee-msg.__logee-msg-log {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-log {
 	color: #eceff1;
 }
 
-.__logee-msg.__logee-msg-info {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-info {
 	color: #18ffff;
 }
 
-.__logee-msg.__logee-msg-debug {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-debug {
 	color: #00b0ff;
 }
 
-.__logee-msg.__logee-msg-error {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-error {
 	color: #ff5252;
 }
 
-.__logee-msg.__logee-msg-success {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-success {
 	color: #00e676;	
 }
 
-.__logee-msg.__logee-msg-warn {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-warn {
 	color: #ff9100;
 }
 
-.__logee-msg.__logee-msg-empty {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-empty {
 	color: #78909c !important;	
 	font-style: italic;
 }
 
-.__logee-msg.__logee-msg-json {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json {
 	margin: 0;
 }
 
-.__logee-msg.__logee-msg-json .__logee-json-key {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-key {
 	font-weight: bold;	
 }
 
-.__logee-msg.__logee-msg-json .__logee-json-string {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-string {
 	color: #76ff03;	
 }
 
-.__logee-msg.__logee-msg-json .__logee-json-number {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-number {
 	color: #18ffff	
 }
 
-.__logee-msg.__logee-msg-json .__logee-json-boolean {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-boolean {
 	color: #40c4ff 
 }
 
-.__logee-msg.__logee-msg-json .__logee-json-null, .__logee-msg.__logee-msg-json .__logee-json-undefined {
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-null, 
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-undefined {
 	color: #ff4081;
 }

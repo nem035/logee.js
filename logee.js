@@ -6,227 +6,212 @@
  * Licensed under MIT (https://github.com/nem035/logee.js/blob/master/LICENSE)
  * ======================================================================== */
 
-(function() {
+(function(global) {
 	"use strict";
 
-	// init window object, if it doesn't exist
-	if(!window) { window = {}; }
+	// create the global object, if it doesn't exist
+	global = global || {};
 	
-	// create the window console object if it doesn't exist
-	if(!window.console) {
-		window.console = {};
-	}
+	// create the global console object if it doesn't exist
+	global.console = global.console || {};
 
 	// DOM method wrappers
-	function f_getById(id) { 
+	function getById(id) { 
 		return document.getElementById(id); 
 	};
-	function f_getByTag(tag) { 
+	function getByTag(tag) { 
 		return document.getElementsByTagName(tag); 
 	};
-	function f_createElem(tag) { 
+	function createElem(tag) { 
 		return document.createElement(tag); 
 	};
-	function f_createTextNode(text) { 
+	function createText(text) { 
 		return document.createTextNode(text); 
 	};
-	function f_appendChild(elem, child) { 
+	function append(elem, child) { 
 		return elem.appendChild(child); 
 	};
-	function f_prependChild(elem, child) { 
-		if(elem.children.length) return elem.insertBefore(child, elem.children[0]); 
-		return appendChild(elem, child);
+	function prepend(elem, child) { 
+		if(elem.children.length > 0) return elem.insertBefore(child, elem.children[0]); 
+		return append(elem, child);
 	};
-	function f_addTextNode(elem, text) { 
-		return elem.appendChild(f_createTextNode(text)); 
+	function addText(elem, text) { 
+		return elem.appendChild(createText(text)); 
 	};
-	function f_addListener(elem, type, callback) {
+	function addListener(elem, type, callback) {
 		return elem.addEventListener(type, callback);
 	};
-	function f_removeListener(elem, type, callback) {
+	function removeListener(elem, type, callback) {
 		return elem.removeEventListener(type, callback);
 	};
-	function f_setHeight(elem, val) {
+	function setHeight(elem, val) {
 		return elem.style.height = val; 
 	};
-	function f_setWidth(elem, val) {
+	function setWidth(elem, val) {
 		return elem.style.width = val; 
 	};
-	function f_setPadding(elem, val) {
+	function setPadding(elem, val) {
 		return elem.style.padding = val;
 	};
-	function f_setDimensions(elem, val) { 
-		f_setHeight(elem, val); 
-		f_setWidth(elem, val); 
+	function setDimensions(elem, val) { 
+		setHeight(elem, val); 
+		setWidth(elem, val); 
 	};
-	function f_scrollToBottom(elem) {
+	function scrollToBottom(elem) {
 		elem.scrollTop = elem.scrollHeight;
 	};
 
-	// make sure SLI loads after the DOM
-	f_addListener(document, 'DOMContentLoaded', function() {
+	// make sure Logee loads after the DOM
+	addListener(document, 'DOMContentLoaded', function() {
 
 		// main variables
-		var _container,					// main container
-			_head,						// header
-			_body,						// body
-			_clearBtn,					// clear button in the header
-			_original = {},				// object that will contain original window.console methods
-			_console = window.console,	// window.console alias
-			p_msgCount = 0;				// log message counter
+		var _container,									// main container
+				_head,											// header
+				_body,											// body
+				_clearBtn,									// clear button in the header
+				_original = {},							// object that will contain original global.console methods
+				_console = global.console;	// global.console alias
 
 		// default parameters
-		var p_containerDim = 250,
-			p_containerPadding = 2,
-			p_headHeight = 25,
-			p_rootId = '__logee',
-			p_clearBtnId = 'clear-btn',
-			p_clearBtnClass = 'clear-btn',
-			p_clearBtnLabel = 'Clear',
-			p_titleText = 'Logee',
-			p_isDraggable = false,
-			p_draggableClass = 'draggable',
-			p_dragOffsetY = 0,
-			p_dragOffsetX = 0,
-			p_prettyJSONSpace = 2,
-			p_UNDEFINED = (p_rootId + '__undefined__');
+		var containerDim = 250,											// height and width of the Logee container
+				containerPadding = 2,										// padding of the Logee container
+				headHeight = 25,												// height of the Logee header
+				rootId = '__logee',											// id for the Logee container
+				clearBtnId = 'clear-btn',								// id for the Clear button
+				clearBtnClass = 'clear-btn',						// class for the Clear button
+				clearBtnLabel = 'Clear',								// label for the Clear button
+				titleText = 'Logee',										// text displayed in the header
+				isDraggable = false,										// flag indicating if the container is draggable
+				draggableClass = 'draggable',						// class added to the container when dragging
+				dragOffsetY = 0,												// vertical offset when dragging the container
+				dragOffsetX = 0,												// horizontal offset when dragging the container
+				prettyJSONSpace = 2,										// number of spacing for JSON.stringify
+				UNDEFINED = (rootId + '__undefined__'),	// string to represent undefined value
+				msgCount = 0;														// log message counter
 
-		// functions
-		function f_setId(elem, id) { 
-			id = p_rootId + (id ? ('-' + id) : '');
-			while(f_getById(id)) {
+		// set id for the element by prepending the root id to the parameter 
+		// and adding random digits until it is unique
+		function setId(elem, id) { 
+			id = rootId + (id ? ('-' + id) : '');
+			while(getById(id)) {
 				id = id + Math.floor(Math.random() * 10);
 			}
 			return elem.id = id; 
 		};
-		function f_addClass(elem, c, noRoot) {
-			c = noRoot ? c : (p_rootId + '-' + c);
+		// add class to the element, prepend the rootId by default
+		function addClass(elem, c) {
+			c = (rootId + '-' + c);
 			if(elem.classList.add) { elem.classList.add(c); }
 			else { elem.className = elem.className.replace(c, ''); }
 		};
-		function f_removeClass(elem, c, noRoot) {
-			c = noRoot ? c : (p_rootId + '-' + c);
+		// remove class from the element
+		function removeClass(elem, c) {
+			c = (rootId + '-' + c);
 			if(elem.classList.remove) { elem.classList.remove(c); }
 			else { elem.className.rep = elem.className + ' ' + c; }
 		};
-		function f_dragContainer(e) {
-			if(p_isDraggable) {
-				_container.style.top = e.clientY - p_dragOffsetY + 'px';
-		    	_container.style.left = e.clientX - p_dragOffsetX + 'px';
+		// called when container is being dragged, adjust its screen position per mouse movement
+		function dragContainer(e) {
+			if(isDraggable) {
+				_container.style.top = e.clientY - dragOffsetY + 'px';
+		    _container.style.left = e.clientX - dragOffsetX + 'px';
 			}
 		};
-		function f_initDrag(e) {
-			if(e.target.id !== (p_rootId + '-' + p_clearBtnId)) { // the user must click the header, but not the clear btn to drag
-				p_isDraggable = true;
-				p_dragOffsetX = e.clientX - _container.offsetLeft;
-				p_dragOffsetY = e.clientY - _container.offsetTop;
-				f_addClass(_container, p_draggableClass);
-				f_addListener(document, 'mousemove', f_dragContainer);
+		// initializes properties and methods for dragging the element
+		function initDrag(e) {
+			if(e.target.id !== (rootId + '-' + clearBtnId)) { // the user must click the header, but not the clear btn to drag
+				isDraggable = true;
+				dragOffsetX = e.clientX - _container.offsetLeft;
+				dragOffsetY = e.clientY - _container.offsetTop;
+				addClass(_container, draggableClass);
+				addListener(document, 'mousemove', dragContainer);
 			}
 		};
-		function f_resetDrag() {
-			p_isDraggable = false;
-			p_dragOffsetX = 0;
-			p_dragOffsetY = 0;
-			f_removeClass(_container, p_draggableClass);
-			f_removeListener(document, 'mousemove', f_dragContainer);
+		// resets properties and methods for dragging the element
+		function resetDrag() {
+			isDraggable = false;
+			dragOffsetX = 0;
+			dragOffsetY = 0;
+			removeClass(_container, draggableClass);
+			removeListener(document, 'mousemove', dragContainer);
 		};
 		// convert arguments to a single spaced string message
-		function f_argsToString(args) { 
+		function argsToString(args) { 
 			return args.map(function(a) {
 				if(a === null) { return 'null'; }
 				if(a === void 0) { return 'undefined'}
 				return a.toString();
 			}).join(' ');
 		};
-		function f_initMessageElem(type) {
-			var elem = f_createElem('div');
-			f_setId(elem, 'msg-' + (++p_msgCount));
-			f_addClass(elem, 'msg');
-			f_addClass(elem, 'msg-' + type);
+		// creates a log message div with proper id and classes
+		function createMessage(type) {
+			var elem = createElem('div');
+			setId(elem, 'msg-' + (++msgCount));
+			addClass(elem, 'msg');
+			addClass(elem, 'msg-' + type);
 			return elem;
 		};
-		function f_appendMessage(message, type) {
+		// formats and adds a message div to the container body
+		function appendMessage(message, type) {
 			var elem, msg;
 			// init dom message element
-			elem = f_initMessageElem(type);
+			elem = createMessage(type);
 			// add create the DOM message content
 			if(type == 'json') {
-				msg = f_createElem('pre');
-				msg.innerHTML = f_JSONsyntaxHighlight(message);
+				msg = createElem('pre');
+				msg.innerHTML = JSONsyntaxHighlight(message);
 			} else {
-				if(!message) {  // make empty string more visible
+				if(!message) {  // make empty string more visible by displaying empty quotes
 					message = '""'; 
-					f_addClass(elem, 'msg-empty');
+					addClass(elem, 'msg-empty');
 				} 
-				msg = f_createTextNode(message);
+				msg = createText(message);
 			}
 			// add the message to the DOM
-			f_appendChild(elem, msg);
-			f_appendChild(_body, elem);
+			append(elem, msg);
+			append(_body, elem);
 			// scroll to the latest msg
-			f_scrollToBottom(_body);
+			scrollToBottom(_body);
 			// set opacity so css animation is activated
 			elem.style.opacity = 1;
 		};
-		function f_JSONstringify(item) {
+		// converts the item into a JSON string
+		function JSONstringify(item) {
 			if(JSON && typeof JSON.stringify == 'function') {
 				return JSON.stringify(item, function(key, value) {
 					if(value === void 0) {
-						return p_UNDEFINED;
+						return UNDEFINED;
 					}
 					return value;
-				}, p_prettyJSONSpace);
+				}, prettyJSONSpace);
 			}
 			return null;
 		};
-		function f_JSONsyntaxHighlight(json) {
-		    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-		    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-		        var cls = 'json-number';
-		        if (/^"/.test(match)) {
-		            if (/:$/.test(match)) {
-		                cls = 'json-key';
-		            } else if(match.substring(1, match.length - 1) === p_UNDEFINED) {
-		            	cls = 'json-undefined';
-		            	match = 'undefined';
-		            } else {
-		                cls = 'json-string';
-		            }
-		        } else if (/true|false/.test(match)) {
-		            cls = 'json-boolean';
-		        } else if (/null/.test(match)) {
-		            cls = 'json-null';
-		        } 
-		        return '<span class="' + p_rootId + '-' + cls + '">' + match + '</span>';
-		    });
+		// parses the JSON string and adds proper classes depending on item type
+		function JSONsyntaxHighlight(json) {
+	    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'json-number';
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = 'json-key';
+          } else if(match.substring(1, match.length - 1) === UNDEFINED) {
+          	cls = 'json-undefined';
+          	match = 'undefined';
+          } else {
+            cls = 'json-string';
+          }
+        } else if (/true|false/.test(match)) {
+          cls = 'json-boolean';
+        } else if (/null/.test(match)) {
+          cls = 'json-null';
+        } 
+        return '<span class="' + rootId + '-' + cls + '">' + match + '</span>';
+	    });
 		};
-		function f_log(args) {
-			f_appendMessage(f_argsToString(args), 'log');
-		};
-		function f_info(args) {
-			f_appendMessage(f_argsToString(args), 'info');
-		};
-		function f_debug(args) {
-			f_appendMessage(f_argsToString(args), 'debug');
-		};
-		function f_success(args) {
-			f_appendMessage(f_argsToString(args), 'success');
-		};
-		function f_error(args) {
-			f_appendMessage(f_argsToString(args), 'error');
-		};
-		function f_warn(args) {
-			f_appendMessage(f_argsToString(args), 'warn');
-		};
-		function f_clear() {
-			_body.innerHTML = '';
-			p_msgCount = 0;
-		};
-		function f_json(args) {
-			f_appendMessage(f_JSONstringify(args[0]), 'json');
-		};
-		function f_enhanceMethod(name, method) {
+
+		// function that creates a new console.log method and saves the original one (or its fallback) 
+		function createMethod(name, method) {
 			_original[name] = _console[name] || _original['log']; // all custom methods fallback to console.log
 			_console[name] = function() {
 				method(Array.prototype.slice.call(arguments));
@@ -234,52 +219,80 @@
 			}
 		};
 
+		// console methods
+
+		function log(args) {
+			appendMessage(argsToString(args), 'log');
+		};
+		function info(args) {
+			appendMessage(argsToString(args), 'info');
+		};
+		function debug(args) {
+			appendMessage(argsToString(args), 'debug');
+		};
+		function success(args) {
+			appendMessage(argsToString(args), 'success');
+		};
+		function error(args) {
+			appendMessage(argsToString(args), 'error');
+		};
+		function warn(args) {
+			appendMessage(argsToString(args), 'warn');
+		};
+		function clear() {
+			_body.innerHTML = '';
+			msgCount = 0;
+		};
+		function json(args) {
+			appendMessage(JSONstringify(args[0]), 'json');
+		};
+
 		// create container
-		_container = f_createElem('div');
-		f_setId(_container, 'container');
-		f_addClass(_container, p_rootId, true);
-		f_setDimensions(_container, p_containerDim);
-		f_setPadding(_container, p_containerPadding + 'px');
+		_container = createElem('div');
+		setId(_container, 'container');
+		addClass(_container, 'container');
+		setDimensions(_container, containerDim);
+		setPadding(_container, containerPadding + 'px');
 
 		// prepend the container element to the body
-		f_prependChild(f_getByTag('body')[0], _container);
+		prepend(getByTag('body')[0], _container);
 
 		// create header
-		_head = f_createElem('div');
-		f_addClass(_head, 'head');
-		f_addTextNode(_head, p_titleText);
-		f_setHeight(_head, p_headHeight);
-		f_addListener(_head, 'mousedown', f_initDrag); 
-		f_addListener(_head, 'mouseup', f_resetDrag);
-		f_appendChild(_container, _head);
+		_head = createElem('div');
+		addClass(_head, 'head');
+		addText(_head, titleText);
+		setHeight(_head, headHeight);
+		addListener(_head, 'mousedown', initDrag); 
+		addListener(_head, 'mouseup', resetDrag);
+		append(_container, _head);
 
 		// create a clear button in the header
-		_clearBtn = f_createElem('button');
+		_clearBtn = createElem('button');
 		_clearBtn.setAttribute('type', 'button');
-		f_setId(_clearBtn, p_clearBtnId);
-		f_addClass(_clearBtn, p_clearBtnClass);
-		f_addTextNode(_clearBtn, p_clearBtnLabel);
+		setId(_clearBtn, clearBtnId);
+		addClass(_clearBtn, clearBtnClass);
+		addText(_clearBtn, clearBtnLabel);
 		_clearBtn.onclick = function() {
 			_console.clear();
 		};
-		f_appendChild(_head, _clearBtn);
+		append(_head, _clearBtn);
 
 		// create body
-		_body = f_createElem('div');
-		f_addClass(_body, 'body');
-		f_setHeight(_body, p_containerDim - p_headHeight - 2*p_containerPadding);
-		f_appendChild(_container, _body);
+		_body = createElem('div');
+		addClass(_body, 'body');
+		setHeight(_body, containerDim - headHeight - 2*containerPadding);
+		append(_container, _body);
 
 		// enhance existing console methods
-		f_enhanceMethod('log', f_log);
-		f_enhanceMethod('info', f_info);
-		f_enhanceMethod('debug', f_debug);
-		f_enhanceMethod('warn', f_warn);
-		f_enhanceMethod('error', f_error);
-		f_enhanceMethod('clear', f_clear);
+		createMethod('log', log);
+		createMethod('info', info);
+		createMethod('debug', debug);
+		createMethod('warn', warn);
+		createMethod('error', error);
+		createMethod('clear', clear);
 
 		// create custom console methods
-		f_enhanceMethod('success', f_success);
-		f_enhanceMethod('json', f_json);
+		createMethod('success', success);
+		createMethod('json', json);
 	});
-})();
+})(window);
