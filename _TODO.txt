@@ -1,6 +1,0 @@
-- Read about the console API
-	https://developer.chrome.com/devtools/docs/console-api#consoledirobject
-	https://developers.google.com/web/tools/chrome-devtools/debug/console/console-ui?hl=en
-	http://stackoverflow.com/questions/15657607/javascript-override-console-log-and-keep-the-old-function
-	http://stackoverflow.com/questions/16259711/how-can-i-override-console-log-and-append-a-word-at-the-beginning-of-the-outpu
-- Make the box resizable
