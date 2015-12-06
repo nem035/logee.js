@@ -41,7 +41,7 @@ All you have to do is include JS and CSS files on your page and Logee does the r
 ```
 ###### Output
 
-![Hello World](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/custom_methods.png)
+![Hello World](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/hello_world.png)
 
 ## Dependencies
 
