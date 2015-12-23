@@ -1,5 +1,5 @@
 /* ========================================================================
- * logee.css v0.0.1
+ * logee.css v0.2.1
  * https://github.com/nem035/logee.js
  * ========================================================================
  * Copyright 2015 Nemanja Stojanovic
@@ -13,7 +13,7 @@
   border-radius: 3px;
   position: fixed;
   z-index: 2147483647;     /* max z index */
-  opacity: 0.95;
+  opacity: 0.99;
 }
 .__logee-draggable {
   border: 2px dashed #eceff1;

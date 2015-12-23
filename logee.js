@@ -1,10 +1,11 @@
 /* ========================================================================
- * logee.js v0.2.0
+ * logee.js v0.2.1
  * https://github.com/nem035/logee.js
  * ========================================================================
  * Copyright 2015 Nemanja Stojanovic
  * Licensed under MIT (https://github.com/nem035/logee.js/blob/master/LICENSE)
  * ======================================================================== */
+ 
 (function(global) {
   "use strict";
 
@@ -198,6 +199,13 @@
       // set opacity so css animation is activated
       elem.style.opacity = 1;
     };
+    // function to check if arg is an array
+    function isArray(x) { 
+    	if(Array.isArray) {
+    		return Array.isArray(x);
+    	}
+    	return Object.prototype.toString.call(x) === '[object Array]';
+    };
     // function to check if arg is an object
     function isObject(x) { 
     	return typeof x === 'object' && x !== null
@@ -210,7 +218,11 @@
           if (val === oldObj) {
             newObj[prop] = CIRC_REF;
           } else {
-            newObj[prop] = {};
+          	if(isArray(val)) {
+          		newObj[prop] = [];
+          	} else {
+            	newObj[prop] = {};
+          	}
             convertCircRefs(oldObj, val, newObj[prop]);
           }
         } else {
