@@ -53,21 +53,31 @@
     return elem.removeEventListener(type, callback);
   };
 
-  function setHeight(elem, val) {
-    return elem.style.height = val;
+  function setHeight(elem, val, enforce) {
+    elem.style.height = val;
+    if(enforce) {
+      elem.style.maxHeight = val + 'px';
+      elem.style.minHeight = val + 'px';
+    }
+    return elem;
   };
 
-  function setWidth(elem, val) {
-    return elem.style.width = val;
+  function setWidth(elem, val, enforce) {
+    elem.style.width = val;
+    if(enforce) {
+      elem.style.maxWidth = val + 'px';
+      elem.style.minWidth = val + 'px';
+    }
+    return elem;
   };
 
   function setPadding(elem, val) {
     return elem.style.padding = val;
   };
 
-  function setDimensions(elem, val) {
-    setHeight(elem, val);
-    setWidth(elem, val);
+  function setDimensions(elem, val, enforce) {
+    setHeight(elem, val, enforce);
+    setWidth(elem, val, enforce);
   };
 
   function scrollToBottom(elem) {
@@ -201,34 +211,48 @@
     };
     // function to check if arg is an array
     function isArray(x) { 
-    	if(Array.isArray) {
-    		return Array.isArray(x);
-    	}
-    	return Object.prototype.toString.call(x) === '[object Array]';
+      if(Array.isArray) {
+        return Array.isArray(x);
+      }
+      return Object.prototype.toString.call(x) === '[object Array]';
     };
     // function to check if arg is an object
     function isObject(x) { 
-    	return typeof x === 'object' && x !== null
+      return typeof x === 'object' && x !== null
+    };
+    // function to iterate over an object or an array
+    function each(item, cb) {
+      if(isArray(item)) {
+        item.forEach(cb);
+      } else if(isObject(item)) {
+        for (var prop in item) {
+          // dont iterate over properties on the prototype chain
+          if(item.hasOwnProperty(prop)) {
+            cb(item[prop], prop);
+          }
+        }
+      } else {
+        throw new Error('Argument is not iterable');
+      }
     };
     // converts all circular references of the item to a string CIRC_REF
     function convertCircRefs(oldObj, currObj, newObj) {
-      for (var prop in currObj) {
-        var val = currObj[prop];
+      each(currObj, function(val, prop) {
         if (isObject(val)) {
           if (val === oldObj) {
             newObj[prop] = CIRC_REF;
           } else {
-          	if(isArray(val)) {
-          		newObj[prop] = [];
-          	} else {
-            	newObj[prop] = {};
-          	}
+            if(isArray(val)) {
+              newObj[prop] = [];
+            } else {
+              newObj[prop] = {};
+            }
             convertCircRefs(oldObj, val, newObj[prop]);
           }
         } else {
           newObj[prop] = val;
         }
-      }
+      });
     };
     // converts the item into a JSON string
     function JSONstringify(item) {
@@ -308,18 +332,18 @@
     };
 
     function json(args) {
-    	if(isObject(args[0])) {
-      	appendMessage(JSONstringify(args[0]), 'json');
-    	} else {
-    		console.log(args[0]);
-    	}
+      if(isObject(args[0])) {
+        appendMessage(JSONstringify(args[0]), 'json');
+      } else {
+        console.log(args[0]);
+      }
     };
 
     // create container
     _container = createElem('div');
     setId(_container, 'container');
     addClass(_container, 'container');
-    setDimensions(_container, containerDim);
+    setDimensions(_container, containerDim, true); // pass true to enforce the dimensions
     setPadding(_container, containerPadding + 'px');
 
     // prepend the container element to the body
@@ -347,7 +371,7 @@
     // create body
     _body = createElem('div');
     addClass(_body, 'body');
-    setHeight(_body, containerDim - headHeight - 2 * containerPadding);
+    setHeight(_body, containerDim - headHeight - 2 * containerPadding, true);
     append(_container, _body);
 
     // enhance existing console methods

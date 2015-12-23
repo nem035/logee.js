@@ -46,6 +46,7 @@
   box-shadow: inset 2px 2px 10px 3px #263238;
   overflow-y: scroll;
   font-family: monospace;
+  width: inherit;
 }
 .__logee-container .__logee-body .__logee-msg {
   border-bottom: 1px solid #455a64;
