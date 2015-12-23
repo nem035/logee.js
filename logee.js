@@ -87,6 +87,7 @@
 				dragOffsetX = 0,												// horizontal offset when dragging the container
 				prettyJSONSpace = 2,										// number of spacing for JSON.stringify
 				UNDEFINED = (rootId + '__undefined__'),	// string to represent undefined value
+				CIRC_REF = '_self_',										// string to represent a circular reference
 				msgCount = 0;														// log message counter
 
 		// set id for the element by prepending the root id to the parameter 
@@ -175,10 +176,28 @@
 			// set opacity so css animation is activated
 			elem.style.opacity = 1;
 		};
+		// converts all circular references of the item to a string CIRC_REF
+		function convertCircRefs(oldObj, currObj, newObj) {
+			for(var prop in currObj) {
+				var val = currObj[prop];
+				if(typeof val === 'object' && val !== null) {
+					if(val === oldObj) {
+						newObj[prop] = CIRC_REF;
+					} else {
+						newObj[prop] = {};
+						convertCircRefs(oldObj, val, newObj[prop]);
+					}
+				} else {
+					newObj[prop] = val;
+				}
+			}
+		};
 		// converts the item into a JSON string
 		function JSONstringify(item) {
 			if(JSON && typeof JSON.stringify == 'function') {
-				return JSON.stringify(item, function(key, value) {
+				var obj = {};
+				convertCircRefs(item, item, obj);
+				return JSON.stringify(obj, function(key, value) {
 					if(value === void 0) {
 						return UNDEFINED;
 					}
