@@ -9,14 +9,14 @@
 .__logee-container {
   background: #37474f;
   color: #eceff1;
-  border: 2px solid #263238;
+  border: 1px solid #263238;
   border-radius: 3px;
   position: fixed;
   z-index: 2147483647;     /* max z index */
   opacity: 0.99;
 }
 .__logee-draggable {
-  border: 2px dashed #eceff1;
+  border: 1px dashed #eceff1;
 }
 .__logee-container .__logee-head {
   border-bottom: 1px solid #263238;
@@ -35,12 +35,14 @@
   border-radius: 3px;
   float: right;
   cursor: pointer;
+  padding: 2px;
+  margin-top: -2px;
 }
 .__logee-container .__logee-head .__logee-clear-btn:hover {
   opacity: 0.85;
 }
-.__logee-container .__logee-head .__logee-clear-btn:focus {
-  outline: none;
+.__logee-container .__logee-head .__logee-clear-btn:active {
+  box-shadow: inset 1px 1px 5px 1px #263238;
 }
 .__logee-container .__logee-body {
   box-shadow: inset 2px 2px 10px 3px #263238;
@@ -50,7 +52,7 @@
 }
 .__logee-container .__logee-body .__logee-msg {
   border-bottom: 1px solid #455a64;
-  padding: 5px;
+  padding: 7px 5px;
   overflow-x: scroll;
   opacity: 0;
   transition: opacity 0.15s linear;
