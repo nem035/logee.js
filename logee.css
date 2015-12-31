@@ -32,7 +32,9 @@
 }
 
 .__logee-container .__logee-header .__logee-header-label {
-  font-size: 1.5em;
+  font-size: 1.2em;
+  float: left;
+  margin-left: 5px; 
 }
 
 .__logee-container .__logee-header .__logee-header-btn {
@@ -42,6 +44,7 @@
   border-radius: 3px;
   cursor: pointer;
   float: right;
+  font-size: 0.8em;
 }
 
 .__logee-container .__logee-header .__logee-header-btn:hover {
@@ -53,7 +56,7 @@
 }
 
 .__logee-header .__logee-zoom-btns {
-  float: left;
+  float: right;
 }
 
 .__logee-header .__logee-zoom-btns  .__logee-header-btn {
@@ -116,11 +119,6 @@
   color: #ff9100;
 }
 
-.__logee-container .__logee-body .__logee-msg.__logee-msg-empty {
-  color: #78909c !important;
-  font-style: italic;
-}
-
 .__logee-container .__logee-body .__logee-msg.__logee-msg-json {
   margin: 0;
 }
@@ -146,6 +144,11 @@
 
 .__logee-container .__logee-body .__logee-msg .__logee-regexp {
   color: #ea80fc;
+}
+
+.__logee-container .__logee-body .__logee-msg .__logee-empty {
+  color: #78909c;
+  font-style: italic;
 }
 
 /* JSON message */

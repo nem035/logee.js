@@ -10,7 +10,7 @@
   "use strict";
 
   // make sure a global object exists
-  if(toType(global) !== 'global') {
+  if(['window', 'global'].indexOf(toType(global)) === -1) {
     throw new Error('Missing the global object');
   }
 
@@ -184,17 +184,21 @@
       REGEXP_CLASS        = 'regexp',
       STRING_CLASS        = 'string',
       BOOLEAN_CLASS       = 'boolean',
-      NULL_CLASS          = 'null';
+      NULL_CLASS          = 'null',
+      EMPTY_CLASS         = 'empty',
+
+      // control constants
+      MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
 
   // ========== Setup variables ========== //
 
   var containerDim      = 300,                        // height and width of the Logee container
       containerPadding  = 2,                          // padding of the Logee container
-      headerHeight      = containerDim * 0.10,        // height of the Logee header is 10% of the container height
+      headerHeight      = 25,                         // height of the Logee header is 10% of the container height
       headerPadding     = 5,                          // padding of the Loggee header
       fontSize          = 14,                         // font size for the Logee body
-      maxFontSize       = 20,                         // maximum font size for the Logee body
-      minFontSize       = 12,                         // minimum font size for the Logee body
+      maxFontSize       = 17,                         // maximum font size for the Logee body
+      minFontSize       = 11,                         // minimum font size for the Logee body
       jsonSpacing       = 2,                          // number of spacing for JSON.stringify
       strUndefined      = toLogeeString('undefined'), // string to represent undefined value
       strRegex          = toLogeeString('regex'),     // string to represent a regular expression
@@ -214,12 +218,12 @@
       clearBtn;                   // clear button in the header
 
   // initialized
-  var originalConsole = {},               // object that will contain original global.console methods
-      console         = global.console,   // global.console alias
-      isDragged       = false,            // flag indicating if the container is being dragged
-      dragOffsetY     = 0,                // vertical offset when dragging the container
-      dragOffsetX     = 0,                // horizontal offset when dragging the container
-      msgCount        = 0;                // log message counter
+  var oldConsole    = {},               // object that will contain original global.console methods
+      console       = global.console,   // global.console alias
+      isDragged     = false,            // flag indicating if the container is being dragged
+      dragOffsetY   = 0,                // vertical offset when dragging the container
+      dragOffsetX   = 0,                // horizontal offset when dragging the container
+      msgCount      = 0;                // log message counter
   
   // ========== Control functions ========== //
 
@@ -274,41 +278,7 @@
     }).join(' ');
   };
 
-  // creates a log message div with proper id and classes
-  function createMessage(type) {
-    var elem = createElem('div');
-    setId(elem, 'msg-' + (++msgCount));
-    addClass(elem, 'msg');
-    addClass(elem, 'msg-' + type);
-    return elem;
-  };
-
-  // formats and adds a message div to the container body
-  function appendMessage(message, type) {
-    var elem, msg;
-    // init dom message element
-    elem = createMessage(type);
-    // add create the DOM message content
-    if (type == 'json') {
-      msg = createElem('div');
-      msg.innerHTML = JSONsyntaxHighlight(message);
-    } else {
-      if (!message) { // make empty string more visible by displaying empty quotes
-        message = strEmpty;
-        addClass(elem, 'msg-empty');
-      }
-      msg = createText(message);
-    }
-    // add the message to the DOM
-    append(elem, msg);
-    append(body, elem);
-    // scroll to the latest msg
-    scrollToBottom(body);
-    // set opacity so fade in animation is activated
-    elem.style.opacity = 1;
-  };
-
-  // function to check if arg is an array
+  // function to check if item is an array
   function isArray(x) { 
     if(Array.isArray) {
       return Array.isArray(x);
@@ -316,22 +286,36 @@
     return toType(x) === 'array';
   };
 
-  // function to check if arg is an object
+  // function to theck if item is array-like
+  function isArrayLike(x) {
+    var len = x.length;
+    return toType(len) == 'number' && len >= 0 && len <= MAX_ARRAY_INDEX;
+  }
+
+  // function to check if item is an object
   function isObject(x) { 
     return toType(x) === 'object';
   };
 
+  // function to convert an item to an array
+  function toArray(item) {
+    return isArrayLike(item) ? Array.prototype.slice.call(item) : null;
+  }
+
   // function to iterate over an object or an array
   function each(item, cb) {
-    if(isArray(item)) {
-      item.forEach(cb);
-    } else if(isObject(item)) {
+    if(isObject(item)) {
       for (var prop in item) {
         // dont iterate over properties on the prototype chain
         if(item.hasOwnProperty(prop)) {
           cb(item[prop], prop);
         }
       }
+    } else if(isArrayLike(item)) {
+      if(!isArray(item)) {
+        item = toArray(item);
+      }
+      item.forEach(cb);
     } else {
       throw new Error('Argument is not iterable');
     }
@@ -421,52 +405,108 @@
     });
   };
 
+  // creates a log message div with proper id and classes
+  function createLogeeMessage(type) {
+    
+    var elem = createElem('div');
+
+    setId(elem, 'msg-' + (++msgCount));
+    addClass(elem, 'msg');
+    addClass(elem, 'msg-' + type);
+
+    return elem;
+  };
+
+  // appends the logge message to the body
+  function appendLogeeMessage(msg) {
+    
+    // add the message to the DOM
+    append(body, msg);
+
+    // scroll to the latest msg
+    scrollToBottom(body);
+
+    // set opacity so fade in animation is activated
+    msg.style.opacity = 1;
+  };
+
+  // formats and adds a message div to the container body
+  function createLogeeMessageNode(message, type) {
+    // init the msg text container 
+    var msg = createElem('div');
+
+    // add create the DOM message content
+    
+    if (type == 'json') {
+    
+      msg.innerHTML = JSONsyntaxHighlight(JSONstringify(message));
+    
+    } else {
+
+      if (message === '') { // make empty string more visible by displaying empty quotes
+       
+        message = strEmpty;
+        addClass(msg, EMPTY_CLASS);
+      
+      } else if(type === 'log') { // if performing a regular log, add data type class
+        
+        addClass(msg, toType(message));
+      
+      } 
+      
+      append(msg, createText(message));
+
+    }
+
+    return msg;
+  };
+
   // function that creates a new console.log method and saves the original one (or its fallback) 
   function createMethod(name, method) {
-    originalConsole[name] = console[name] || originalConsole['log']; // all custom methods fallback to console.log
+    
+    oldConsole[name] = console[name] || oldConsole['log']; // all custom methods fallback to console.log
+    
     console[name] = function() {
-      method(Array.prototype.slice.call(arguments));
-      if (originalConsole[name]) originalConsole[name].apply(console, arguments);
+      
+      // call the particular log method
+      if(name === 'clear') {
+      
+        clearIt();
+      
+      } else {
+
+        // convert the arguments of the console function to an array
+        var args = toArray(arguments);
+
+        // create the dom element containing the current message
+        var msg = createLogeeMessage(name);
+
+        logIt(msg, args, name);
+
+        appendLogeeMessage(msg);
+      }
+      
+      // call the old console method or its fallback, if they exist
+      if (oldConsole[name]) oldConsole[name].apply(console, arguments);
     }
   };
 
   // ========== API Methods ========== //
 
-  function log(args) {
-    appendMessage(argsToString(args), 'log');
+  function logIt(msg, args, type) {
+    if(type === 'log' || type === 'json') {
+      each(args, function(a) {
+        append(msg, createLogeeMessageNode(a, type));
+      });
+    } else {
+      append(msg, createLogeeMessageNode(argsToString(args), type));
+    }
+     
   };
 
-  function info(args) {
-    appendMessage(argsToString(args), 'info');
-  };
-
-  function debug(args) {
-    appendMessage(argsToString(args), 'debug');
-  };
-
-  function success(args) {
-    appendMessage(argsToString(args), 'success');
-  };
-
-  function error(args) {
-    appendMessage(argsToString(args), 'error');
-  };
-
-  function warn(args) {
-    appendMessage(argsToString(args), 'warn');
-  };
-
-  function clear() {
+  function clearIt() {
     body.innerHTML = '';
     msgCount = 0;
-  };
-
-  function json(args) {
-    if(isObject(args[0])) {
-      appendMessage(JSONstringify(args[0]), 'json');
-    } else {
-      console.log(args[0]);
-    }
   };
 
   // make sure Logee loads after the DOM
@@ -544,15 +584,15 @@
     append(container, body);
 
     // enhance existing console methods
-    createMethod('log', log);
-    createMethod('info', info);
-    createMethod('debug', debug);
-    createMethod('warn', warn);
-    createMethod('error', error);
-    createMethod('clear', clear);
+    createMethod('log');
+    createMethod('info');
+    createMethod('debug');
+    createMethod('warn');
+    createMethod('error');
+    createMethod('clear');
 
     // create custom console methods
-    createMethod('success', success);
-    createMethod('json', json);
+    createMethod('success');
+    createMethod('json');
   });
 })(window);

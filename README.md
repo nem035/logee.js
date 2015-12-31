@@ -2,14 +2,31 @@
 
 LogeeJS is a plain JavaScript library that extends the [console API](https://developer.chrome.com/devtools/docs/console-api) and allows basic logging without openning the browser console.
 
-##### Sample screenshots showing extended and custom methods
+All existing console methods behave as they do in the browser console, with additional UI logs in a small draggable box.
+Custom methods fallback to `console.log` in the browser console.
 
-![Enhanced Methods](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/existing_methods.png)
-![Custom Methods](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/custom_methods.png)
+#### Examples
+
+`console.log` outputs each argument on a new line, coloring it based on its type.
+
+![Console Log](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/console-log.png)
+![Logee Log](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-log.png)
+
+Other methods concatenate the arguments and print them on a single line, with the appropriate method color. For instance:
+
+![Console Info](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/console-info.png)
+![Logee Info](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-info.png)
+
+All methods that behave like `console.info`:
+
+![Log Methods](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/methods.png)
+
+Outputing a json can be done using `console.json`. A special string `_self_` is logged in case of a circular reference.
+
+![Console Json](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-json.png)
+
 
 ## Methods
-
-All methods behave as they do in the browser console, with additional UI logs in a small draggable box.
 
 ##### Extended
 * [console.log](https://developer.chrome.com/devtools/docs/console-api#consolelog)
@@ -30,20 +47,18 @@ All methods behave as they do in the browser console, with additional UI logs in
 All you have to do is include JS and CSS files on your page and Logee does the rest.
 
 ```html
-<script src="logee.js" type="text/javascript"></script>
 <link href="logee.css" rel="stylesheet" type="text/css"/>
+<script src="logee.js" type="text/javascript"></script>
 
 <!-- ... rest of your page -->
 <script>
-	console.log('Hello World'); // logs in the console as usual as well as in the Logee box
+	console.log('Log String', 1234, /abcd/g); // displays each argument on a new line, colored by its type
+	console.warning('This', 'is', 'an', 'info', 'msg'); // concatenates all arguments and displays them as a single-spaced, orange, string
+	console.json({name: 'Nemanja', age: 123 }); // displayed a full json with syntax highlighting
+	// ...
 </script>
-
 ```
-###### Output
-
-![Hello World](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/hello_world.png)
 
 ## Dependencies
 
 None.
-
