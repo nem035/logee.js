@@ -9,7 +9,7 @@
 ;(function(global) {
   "use strict";
 
-  if(!isObject(global)) {
+  if(toType(global) !== 'global') {
     throw new Error('Missing the global object');
   }
 
@@ -18,34 +18,13 @@
     global.console = {};
   }
 
-  // ========== Default & Control variables ========== //
+  // ========== Helper methods ========== //
 
-  var containerDim = 300, // height and width of the Logee container
-    containerPadding = 2, // padding of the Logee container
-    headHeight = containerDim * 0.10, // height of the Logee header
-    headPadding = 5, // padding of the Loggee header
-    ROOT_ID = '__logee', // id for the Logee container
-    CLEAR_BTN_ID = 'clear-btn', // id for the Clear button
-    CLEAR_BTN_CLASS = 'clear-btn', // class for the Clear button
-    CLEAR_BTN_LABEL = 'Clear', // label for the Clear button
-    TITLE_TEXT = 'Logee', // text displayed in the header
-    DRAG_CLASS = 'draggable', // class added to the container when dragging
-    JSON_SPACING = 2, // number of spacing for JSON.stringify
-    UNDEFINED = (ROOT_ID + '__undefined__'), // string to represent undefined value
-    CIRC_REF = '_me_'; // string to represent a circular reference
-
-  var _container, // main container
-    _head, // header
-    _body, // body
-    _clearBtn, // clear button in the header
-    _original = {}, // object that will contain original global.console methods
-    _console = global.console, // global.console alias
-    isDragged = false, // flag indicating if the container is being dragged
-    dragOffsetY = 0, // vertical offset when dragging the container
-    dragOffsetX = 0, // horizontal offset when dragging the container
-    msgCount = 0; // log message counter
-
-  // ========== DOM method wrappers ========== //
+  // function to get the proper type of a variable 
+  // shoutout AngusCroll (https://goo.gl/pxwQGp)
+  function toType(x) {
+    return ({}).toString.call(x).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+  }
 
   // function to get an element by id
   function getById(id) {
@@ -88,12 +67,20 @@
     return elem.removeEventListener(type, callback);
   };
 
+  // function to append 'px' if necessary
+  function pixelize(val) {
+    if(toType(val) === 'string') {
+      val = parseInt(val);
+    }
+    return val + 'px';
+  }
+
   // function to set the height of an element
   function setHeight(elem, val, enforce) {
     elem.style.height = val;
     if(enforce) {
-      elem.style.maxHeight = val + 'px';
-      elem.style.minHeight = val + 'px';
+      elem.style.maxHeight = pixelize(val);
+      elem.style.minHeight = pixelize(val);
     }
     return elem;
   };
@@ -102,15 +89,15 @@
   function setWidth(elem, val, enforce) {
     elem.style.width = val;
     if(enforce) {
-      elem.style.maxWidth = val + 'px';
-      elem.style.minWidth = val + 'px';
+      elem.style.maxWidth = pixelize(val);
+      elem.style.minWidth = pixelize(val);
     }
     return elem;
   };
 
   // function to set the padding of an element
   function setPadding(elem, val) {
-    return elem.style.padding = val + 'px';
+    return elem.style.padding = pixelize(val);
   };
 
   // function to set the width and height of an element
@@ -127,16 +114,16 @@
   // set id for the element by prepending the root id to the parameter 
   // and adding random digits until it is unique
   function setId(elem, id) {
-    id = ROOT_ID + (id ? ('-' + id) : '');
+    id = toLogeeString(id);
     while (getById(id)) {
       id = id + Math.floor(Math.random() * 10);
     }
     return elem.id = id;
   };
 
-  // add class to the element, prepend the ROOT_ID by default
+  // add class to the element
   function addClass(elem, c) {
-    c = (ROOT_ID + '-' + c);
+    c = toLogeeString(c);
     if (elem.classList.add) {
       elem.classList.add(c);
     } else {
@@ -146,7 +133,7 @@
 
   // remove class from the element
   function removeClass(elem, c) {
-    c = (ROOT_ID + '-' + c);
+    c = toLogeeString(c);
     if (elem.classList.remove) {
       elem.classList.remove(c);
     } else {
@@ -154,23 +141,107 @@
     }
   };
 
+  // check if element has a class
+  function hasClass(elem, c) {
+    return Array.prototype.indexOf.call(elem.classList, c) !== -1;
+  }
+
+  // ========== Constants ========== //
+
+  var LOGEE_ID = '__logee',                       // prefix to all DOM identifiers (classes and ids)
+      
+      CONTAINER_ID = 'container',                 // id for the Logee container
+      CONTAINER_CLASS = 'container',              // class for the Logee container
+
+      HEADER_CLASS = 'header',                    // class for the Logee header
+      HEADER_LABEL_CLASS = 'header-label',        // class for the header label
+      HEADER_BTN_CLASS = 'header-btn',            // class for all buttons in the header
+
+      ZOOM_BTNS_CLASS = 'zoom-btns',              // class for the zoom buttons wrapper in the header
+
+      PLUS_BTN_CLASS = 'plus-btn',                // class for the Plus button
+      PLUS_BTN_LABEL = '+',                       // label for the Plus button
+      
+      MINUS_BTN_CLASS = 'minus-btn',              // class for the Minus button
+      MINUS_BTN_LABEL = '-',                      // label for the Minus button
+      
+      CLEAR_BTN_CLASS = 'clear-btn',              // class for the Clear button
+      CLEAR_BTN_LABEL = 'Clear',                  // label for the Clear button
+      
+      HEADER_LABEL = 'Logee',                     // text displayed in the header
+      
+      BODY_CLASS = 'body',                        // class for the Logee Box body
+
+      DRAG_CLASS = 'draggable',                  // class added to the container when dragging
+
+      NUMBER_CLASS = 'number',
+      JSON_KEY_CLASS = 'json-key',
+      JSON_PROP_CLASS = 'json-prop',
+      UNDEFINED_CLASS = 'undefined',
+      CIRCULAR_REF_CLASS = 'circ-ref',
+      REGEXP_CLASS = 'regexp',
+      STRING_CLASS = 'string',
+      BOOLEAN_CLASS = 'boolean',
+      NULL_CLASS = 'null';
+
+  // ========== Setup variables ========== //
+
+  var containerDim = 300,                         // height and width of the Logee container
+      containerPadding = 2,                       // padding of the Logee container
+      headerHeight = containerDim * 0.10,         // height of the Logee header
+      headerPadding = 5,                          // padding of the Loggee header
+      fontSize = 14,                              // font size for the Logee body
+      maxFontSize = 20,                           // maximum font size for the Logee body
+      minFontSize = 12,                           // minimum font size for the Logee body
+      jsonSpacing = 2,                            // number of spacing for JSON.stringify
+      strUndefined = toLogeeString('undefined'),  // string to represent undefined value
+      strRegex = toLogeeString('regex'),          // string to represent a regular expression
+      strCircularRef = toLogeeString('_self_');   // string to represent a circular reference
+      
+  // ========== Control variables ========== //
+
+  var container,                  // Logee Box container
+      header,                     // Logee Box header
+      headerLabel,                // header label
+      body,                       // Logee Box body
+      zoomBtns,                   // container for the zoom buttons,
+      plusBtn,                    // plus button in the header
+      minusBtn,                   // minus button in the header
+      clearBtn,                   // clear button in the header
+      originalConsole = {},       // object that will contain original global.console methods
+      console = global.console,   // global.console alias
+      isDragged = false,          // flag indicating if the container is being dragged
+      dragOffsetY = 0,            // vertical offset when dragging the container
+      dragOffsetX = 0,            // horizontal offset when dragging the container
+      msgCount = 0;               // log message counter
+  
   // ========== Control functions ========== //
+
+  // function to convert any string to a Logee string
+  function toLogeeString(s) {
+    return (LOGEE_ID + '-' + s);
+  }
+
+  // function to convert any Logee string to a regular string
+  function fromLogeeString(s) {
+    return s.replace(LOGEE_ID + '-', '');
+  }
 
   // called when container is being dragged, adjust its screen position per mouse movement
   function dragContainer(e) {
     if (isDragged) {
-      _container.style.top = e.clientY - dragOffsetY + 'px';
-      _container.style.left = e.clientX - dragOffsetX + 'px';
+      container.style.top = pixelize(e.clientY - dragOffsetY);
+      container.style.left = pixelize(e.clientX - dragOffsetX);
     }
   };
 
   // initializes properties and methods for dragging the element
   function initDrag(e) {
-    if (e.target.id !== (ROOT_ID + '-' + CLEAR_BTN_ID)) { // the user must click the header, but not the clear btn to drag
+    if (!hasClass(e.target, toLogeeString(HEADER_BTN_CLASS))) { // the user must click the header, but not a header button
       isDragged = true;
-      dragOffsetX = e.clientX - _container.offsetLeft;
-      dragOffsetY = e.clientY - _container.offsetTop;
-      addClass(_container, DRAG_CLASS);
+      dragOffsetX = e.clientX - container.offsetLeft;
+      dragOffsetY = e.clientY - container.offsetTop;
+      addClass(container, DRAG_CLASS);
       addListener(document, 'mousemove', dragContainer);
     }
   };
@@ -180,7 +251,7 @@
     isDragged = false;
     dragOffsetX = 0;
     dragOffsetY = 0;
-    removeClass(_container, DRAG_CLASS);
+    removeClass(container, DRAG_CLASS);
     removeListener(document, 'mousemove', dragContainer);
   };
 
@@ -224,9 +295,9 @@
     }
     // add the message to the DOM
     append(elem, msg);
-    append(_body, elem);
+    append(body, elem);
     // scroll to the latest msg
-    scrollToBottom(_body);
+    scrollToBottom(body);
     // set opacity so fade in animation is activated
     elem.style.opacity = 1;
   };
@@ -236,12 +307,12 @@
     if(Array.isArray) {
       return Array.isArray(x);
     }
-    return Object.prototype.toString.call(x) === '[object Array]';
+    return toType(x) === 'array';
   };
 
   // function to check if arg is an object
   function isObject(x) { 
-    return typeof x === 'object' && x !== null;
+    return toType(x) === 'object';
   };
 
   // function to iterate over an object or an array
@@ -260,12 +331,12 @@
     }
   };
 
-  // converts all circular references of the item to a string CIRC_REF
+  // converts all circular references of the item to a string strCircularRef
   function convertCircRefs(oldObj, currObj, newObj) {
     each(currObj, function(val, prop) {
-      if (isObject(val)) {
+      if (isObject(val) || isArray(val)) {
         if (val === oldObj) {
-          newObj[prop] = CIRC_REF;
+          newObj[prop] = strCircularRef;
         } else {
           if(isArray(val)) {
             newObj[prop] = [];
@@ -282,15 +353,21 @@
 
   // converts the item into a JSON string
   function JSONstringify(item) {
-    if (JSON && typeof JSON.stringify == 'function') {
+    if (toType(JSON) === 'json') {
       var obj = {};
       convertCircRefs(item, item, obj);
       return JSON.stringify(obj, function(key, value) {
+        
         if (value === void 0) {
-          return UNDEFINED;
+          return strUndefined;
         }
+        
+        if (toType(value) === 'regexp') {
+          return strRegex + value.toString();
+        }
+        
         return value;
-      }, JSON_SPACING);
+      }, jsonSpacing);
     }
     return null;
   };
@@ -299,31 +376,45 @@
   function JSONsyntaxHighlight(json) {
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
-      var cls = 'json-number';
+      var cls = NUMBER_CLASS;
+      // if starts with a double quote
       if (/^"/.test(match)) {
+        // if ends with a colon
         if (/:$/.test(match)) {
-          cls = 'json-key';
-        } else if (match.substring(1, match.length - 1) === UNDEFINED) {
-          cls = 'json-undefined';
-          match = 'undefined';
+          cls = JSON_KEY_CLASS;
         } else {
-          cls = 'json-string';
+          // unquote the value (remove surrounding quotes)
+          var unquoted = match.substring(1, match.length - 1);
+
+          // determine the class and match
+          if (unquoted === strUndefined) {
+            cls = UNDEFINED_CLASS;
+            match = 'undefined';
+          } else if (unquoted === strCircularRef) {
+            cls = CIRCULAR_REF_CLASS;
+            match = fromLogeeString(strCircularRef);
+          } else if (unquoted.startsWith(strRegex)) {
+            cls = REGEXP_CLASS;
+            match = unquoted.replace(strRegex, '');
+          } else {
+            cls = STRING_CLASS;
+          }
         }
       } else if (/true|false/.test(match)) {
-        cls = 'json-boolean';
+        cls = BOOLEAN_CLASS;
       } else if (/null/.test(match)) {
-        cls = 'json-null';
+        cls = NULL_CLASS;
       }
-      return '<span class="' + ROOT_ID + '-' + cls + '">' + match + '</span>';
+      return '<span class="' + (cls === JSON_KEY_CLASS ? '' : toLogeeString(JSON_PROP_CLASS)) + ' ' + toLogeeString(cls) + '">' + match + '</span>';
     });
   };
 
   // function that creates a new console.log method and saves the original one (or its fallback) 
   function createMethod(name, method) {
-    _original[name] = _console[name] || _original['log']; // all custom methods fallback to console.log
-    _console[name] = function() {
+    originalConsole[name] = console[name] || originalConsole['log']; // all custom methods fallback to console.log
+    console[name] = function() {
       method(Array.prototype.slice.call(arguments));
-      if (_original[name]) _original[name].apply(_console, arguments);
+      if (originalConsole[name]) originalConsole[name].apply(console, arguments);
     }
   };
 
@@ -354,7 +445,7 @@
   };
 
   function clear() {
-    _body.innerHTML = '';
+    body.innerHTML = '';
     msgCount = 0;
   };
 
@@ -370,40 +461,75 @@
   addListener(document, 'DOMContentLoaded', function() {
 
     // create container
-    _container = createElem('div');
-    setId(_container, 'container');
-    addClass(_container, 'container');
-    setDimensions(_container, containerDim, true); // pass true to enforce the dimensions
-    setPadding(_container, containerPadding);
+    container = createElem('div');
+    setId(container, CONTAINER_ID);
+    addClass(container, CONTAINER_CLASS);
+    setDimensions(container, containerDim, true); // pass true to enforce the dimensions
+    setPadding(container, containerPadding);
 
     // prepend the container element to the body
-    prepend(document.body, _container);
+    prepend(document.body, container);
 
-    // create header
-    _head = createElem('div');
-    addClass(_head, 'head');
-    appendText(_head, TITLE_TEXT);
-    setHeight(_head, headHeight, true);
-    setPadding(_head, headPadding);
-    addListener(_head, 'mousedown', initDrag);
-    addListener(_head, 'mouseup', resetDrag);
-    append(_container, _head);
+    // create Logee Box header
+    header = createElem('div');
+    addClass(header, HEADER_CLASS);
+    setHeight(header, headerHeight, true);
+    setPadding(header, headerPadding);
+    addListener(header, 'mousedown', initDrag);
+    addListener(header, 'mouseup', resetDrag);
+    append(container, header);
+
+    // create the label in the header
+    headerLabel = createElem('span');
+    addClass(headerLabel, HEADER_LABEL_CLASS);
+    appendText(headerLabel, HEADER_LABEL);
+    append(header, headerLabel);
 
     // create a clear button in the header
-    _clearBtn = createElem('div');
-    setId(_clearBtn, CLEAR_BTN_ID);
-    addClass(_clearBtn, CLEAR_BTN_CLASS);
-    appendText(_clearBtn, CLEAR_BTN_LABEL);
-    _clearBtn.onclick = function() {
-      _console.clear();
+    clearBtn = createElem('div');
+    addClass(clearBtn, HEADER_BTN_CLASS);
+    addClass(clearBtn, CLEAR_BTN_CLASS);
+    appendText(clearBtn, CLEAR_BTN_LABEL);
+    clearBtn.onclick = function() {
+      console.clear();
     };
-    append(_head, _clearBtn);
+    append(header, clearBtn);
 
-    // create body
-    _body = createElem('div');
-    addClass(_body, 'body');
-    setHeight(_body, containerDim - 2 * containerPadding - headHeight, true);
-    append(_container, _body);
+    // create the zoom buttons in the header
+    zoomBtns = createElem('div');
+    addClass(zoomBtns, ZOOM_BTNS_CLASS);
+    append(header, zoomBtns);
+
+    // create the plus button
+    plusBtn = createElem('div');
+    addClass(plusBtn, HEADER_BTN_CLASS);
+    addClass(plusBtn, PLUS_BTN_CLASS);
+    appendText(plusBtn, PLUS_BTN_LABEL);
+    plusBtn.onclick = function() {
+      if(fontSize <= maxFontSize) {
+        body.style.fontSize = pixelize(++fontSize);
+      }
+    };
+    append(zoomBtns, plusBtn);
+
+    // create the minus button
+    minusBtn = createElem('div');
+    addClass(minusBtn, HEADER_BTN_CLASS);
+    addClass(minusBtn, MINUS_BTN_CLASS);
+    appendText(minusBtn, MINUS_BTN_LABEL);
+    minusBtn.onclick = function() {
+      if(fontSize >= minFontSize) {
+        body.style.fontSize = pixelize(--fontSize);
+      }
+    };
+    append(zoomBtns, minusBtn);
+
+    // create Logee Box body
+    body = createElem('div');
+    addClass(body, BODY_CLASS);
+    setHeight(body, containerDim - 2 * containerPadding - headerHeight, true);
+    body.style.fontSize = pixelize(fontSize);
+    append(container, body);
 
     // enhance existing console methods
     createMethod('log', log);

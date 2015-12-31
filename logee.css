@@ -6,6 +6,8 @@
  * Licensed under MIT (https://github.com/nem035/logee.js/blob/master/LICENSE)
  * ======================================================================== */
 
+/* Main container */
+
 .__logee-container {
   background: #37474f;
   color: #eceff1;
@@ -14,42 +16,65 @@
   position: fixed;
   z-index: 2147483647;     /* max z index */
   opacity: 0.99;
+  font-family:  monospace;
 }
-.__logee-draggable {
-  border: 1px dashed #eceff1;
-}
-.__logee-container .__logee-head {
+
+/* Header */
+
+.__logee-container .__logee-header {
   border-bottom: 1px solid #263238;
-  padding: 2px;
-  font-size: 1.2em;
-  font-weight: bold;
+  padding: 0px 2px 2px 0px !important;
   box-shadow: 0px 2px 10px 0px #263238;
   cursor: move;
   font-size: 1em;
-  font-family: 'Rockwell Extra Bold', 'Rockwell Bold', monospace;
+  font-weight: bold;
+  text-align: center; 
 }
-.__logee-container .__logee-head .__logee-clear-btn {
+
+.__logee-container .__logee-header .__logee-header-label {
+  font-size: 1.5em;
+}
+
+.__logee-container .__logee-header .__logee-header-btn {
   background: #eceff1;
   color: #263238;
   border: 1px solid #263238;
   border-radius: 3px;
-  float: right;
   cursor: pointer;
-  padding: 2px;
-  margin-top: -2px;
+  float: right;
 }
-.__logee-container .__logee-head .__logee-clear-btn:hover {
+
+.__logee-container .__logee-header .__logee-header-btn:hover {
   opacity: 0.85;
 }
-.__logee-container .__logee-head .__logee-clear-btn:active {
+
+.__logee-container .__logee-header .__logee-header-btn:active {
   box-shadow: inset 1px 1px 5px 1px #263238;
 }
+
+.__logee-header .__logee-zoom-btns {
+  float: left;
+}
+
+.__logee-header .__logee-zoom-btns  .__logee-header-btn {
+  padding: 1px 6px;
+  margin-right: 5px;
+  border-radius: 50px;
+}
+
+.__logee-container .__logee-header .__logee-clear-btn {
+  padding: 2px;
+}
+
+/* Body */
+
 .__logee-container .__logee-body {
   box-shadow: inset 2px 2px 10px 3px #263238;
   overflow-y: scroll;
   font-family: monospace;
-  width: inherit;
+  width: 100%;
 }
+
 .__logee-container .__logee-body .__logee-msg {
   border-bottom: 1px solid #455a64;
   padding: 7px 5px;
@@ -58,44 +83,77 @@
   transition: opacity 0.15s linear;
   white-space: pre;
 }
+
+/* Other */
+
+.__logee-draggable {
+  border: 1px dashed #eceff1;
+}
+
+/* Message types */
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-log {
   color: #eceff1;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-info {
   color: #18ffff;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-debug {
   color: #00b0ff;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-error {
   color: #ff5252;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-success {
   color: #00e676;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-warn {
   color: #ff9100;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-empty {
   color: #78909c !important;
   font-style: italic;
 }
+
 .__logee-container .__logee-body .__logee-msg.__logee-msg-json {
   margin: 0;
 }
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-key {
-  font-weight: bold;
-}
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-string {
+
+/* Data types */
+
+.__logee-container .__logee-body .__logee-msg .__logee-string {
   color: #76ff03;
 }
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-number {
+
+.__logee-container .__logee-body .__logee-msg .__logee-number {
   color: #18ffff
 }
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-boolean {
+
+.__logee-container .__logee-body .__logee-msg .__logee-boolean {
   color: #40c4ff
 }
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-null,
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-undefined {
+
+.__logee-container .__logee-body .__logee-msg .__logee-null,
+.__logee-container .__logee-body .__logee-msg .__logee-undefined {
   color: #ff4081;
+}
+
+.__logee-container .__logee-body .__logee-msg .__logee-regexp {
+  color: #ea80fc;
+}
+
+/* JSON message */
+
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-key {
+}
+
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-circ-ref {
+  color: yellow;
+  font-style: italic;
 }
