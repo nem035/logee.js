@@ -9,6 +9,7 @@
 ;(function(global) {
   "use strict";
 
+  // make sure a global object exists
   if(toType(global) !== 'global') {
     throw new Error('Missing the global object');
   }
@@ -148,58 +149,61 @@
 
   // ========== Constants ========== //
 
-  var LOGEE_ID = '__logee',                       // prefix to all DOM identifiers (classes and ids)
+  var LOGEE_ID            = '__logee',      // prefix to all DOM identifiers (classes and ids)
       
-      CONTAINER_ID = 'container',                 // id for the Logee container
-      CONTAINER_CLASS = 'container',              // class for the Logee container
+      CONTAINER_ID        = 'container',    // id for the Logee container
+      CONTAINER_CLASS     = 'container',    // class for the Logee container
 
-      HEADER_CLASS = 'header',                    // class for the Logee header
-      HEADER_LABEL_CLASS = 'header-label',        // class for the header label
-      HEADER_BTN_CLASS = 'header-btn',            // class for all buttons in the header
+      HEADER_CLASS        = 'header',       // class for the Logee header
+      HEADER_LABEL_CLASS  = 'header-label', // class for the header label
+      HEADER_BTN_CLASS    = 'header-btn',   // class for all buttons in the header
 
-      ZOOM_BTNS_CLASS = 'zoom-btns',              // class for the zoom buttons wrapper in the header
+      ZOOM_BTNS_CLASS     = 'zoom-btns',    // class for the zoom buttons wrapper in the header
 
-      PLUS_BTN_CLASS = 'plus-btn',                // class for the Plus button
-      PLUS_BTN_LABEL = '+',                       // label for the Plus button
+      PLUS_BTN_CLASS      = 'plus-btn',     // class for the Plus button
+      PLUS_BTN_LABEL      = '+',            // label for the Plus button
       
-      MINUS_BTN_CLASS = 'minus-btn',              // class for the Minus button
-      MINUS_BTN_LABEL = '-',                      // label for the Minus button
+      MINUS_BTN_CLASS     = 'minus-btn',    // class for the Minus button
+      MINUS_BTN_LABEL     = '-',            // label for the Minus button
       
-      CLEAR_BTN_CLASS = 'clear-btn',              // class for the Clear button
-      CLEAR_BTN_LABEL = 'Clear',                  // label for the Clear button
+      CLEAR_BTN_CLASS     = 'clear-btn',    // class for the Clear button
+      CLEAR_BTN_LABEL     = 'Clear',        // label for the Clear button
       
-      HEADER_LABEL = 'Logee',                     // text displayed in the header
+      HEADER_LABEL        = 'Logee',        // text displayed in the header
       
-      BODY_CLASS = 'body',                        // class for the Logee Box body
+      BODY_CLASS          = 'body',         // class for the Logee Box body
 
-      DRAG_CLASS = 'draggable',                  // class added to the container when dragging
+      DRAG_CLASS          = 'draggable',    // class added to the container when dragging
 
-      NUMBER_CLASS = 'number',
-      JSON_KEY_CLASS = 'json-key',
-      JSON_PROP_CLASS = 'json-prop',
-      UNDEFINED_CLASS = 'undefined',
-      CIRCULAR_REF_CLASS = 'circ-ref',
-      REGEXP_CLASS = 'regexp',
-      STRING_CLASS = 'string',
-      BOOLEAN_CLASS = 'boolean',
-      NULL_CLASS = 'null';
+      // CSS classes for different data types
+      NUMBER_CLASS        = 'number',           
+      JSON_KEY_CLASS      = 'json-key',
+      JSON_PROP_CLASS     = 'json-prop',
+      UNDEFINED_CLASS     = 'undefined',
+      CIRCULAR_REF_CLASS  = 'circ-ref',
+      REGEXP_CLASS        = 'regexp',
+      STRING_CLASS        = 'string',
+      BOOLEAN_CLASS       = 'boolean',
+      NULL_CLASS          = 'null';
 
   // ========== Setup variables ========== //
 
-  var containerDim = 300,                         // height and width of the Logee container
-      containerPadding = 2,                       // padding of the Logee container
-      headerHeight = containerDim * 0.10,         // height of the Logee header
-      headerPadding = 5,                          // padding of the Loggee header
-      fontSize = 14,                              // font size for the Logee body
-      maxFontSize = 20,                           // maximum font size for the Logee body
-      minFontSize = 12,                           // minimum font size for the Logee body
-      jsonSpacing = 2,                            // number of spacing for JSON.stringify
-      strUndefined = toLogeeString('undefined'),  // string to represent undefined value
-      strRegex = toLogeeString('regex'),          // string to represent a regular expression
-      strCircularRef = toLogeeString('_self_');   // string to represent a circular reference
+  var containerDim      = 300,                        // height and width of the Logee container
+      containerPadding  = 2,                          // padding of the Logee container
+      headerHeight      = containerDim * 0.10,        // height of the Logee header is 10% of the container height
+      headerPadding     = 5,                          // padding of the Loggee header
+      fontSize          = 14,                         // font size for the Logee body
+      maxFontSize       = 20,                         // maximum font size for the Logee body
+      minFontSize       = 12,                         // minimum font size for the Logee body
+      jsonSpacing       = 2,                          // number of spacing for JSON.stringify
+      strUndefined      = toLogeeString('undefined'), // string to represent undefined value
+      strRegex          = toLogeeString('regex'),     // string to represent a regular expression
+      strCircularRef    = toLogeeString('_self_'),    // string to represent a circular reference
+      strEmpty          = '""';                       // string to represent an empty string
       
   // ========== Control variables ========== //
 
+  // uninitialized
   var container,                  // Logee Box container
       header,                     // Logee Box header
       headerLabel,                // header label
@@ -207,13 +211,15 @@
       zoomBtns,                   // container for the zoom buttons,
       plusBtn,                    // plus button in the header
       minusBtn,                   // minus button in the header
-      clearBtn,                   // clear button in the header
-      originalConsole = {},       // object that will contain original global.console methods
-      console = global.console,   // global.console alias
-      isDragged = false,          // flag indicating if the container is being dragged
-      dragOffsetY = 0,            // vertical offset when dragging the container
-      dragOffsetX = 0,            // horizontal offset when dragging the container
-      msgCount = 0;               // log message counter
+      clearBtn;                   // clear button in the header
+
+  // initialized
+  var originalConsole = {},               // object that will contain original global.console methods
+      console         = global.console,   // global.console alias
+      isDragged       = false,            // flag indicating if the container is being dragged
+      dragOffsetY     = 0,                // vertical offset when dragging the container
+      dragOffsetX     = 0,                // horizontal offset when dragging the container
+      msgCount        = 0;                // log message counter
   
   // ========== Control functions ========== //
 
@@ -288,7 +294,7 @@
       msg.innerHTML = JSONsyntaxHighlight(message);
     } else {
       if (!message) { // make empty string more visible by displaying empty quotes
-        message = '""';
+        message = strEmpty;
         addClass(elem, 'msg-empty');
       }
       msg = createText(message);
@@ -331,7 +337,7 @@
     }
   };
 
-  // converts all circular references of the item to a string strCircularRef
+  // recursively converts all circular references of the item to a string strCircularRef
   function convertCircRefs(oldObj, currObj, newObj) {
     each(currObj, function(val, prop) {
       if (isObject(val) || isArray(val)) {
@@ -351,7 +357,7 @@
     });
   };
 
-  // converts the item into a JSON string
+  // converts the item into an appropriate JSON string
   function JSONstringify(item) {
     if (toType(JSON) === 'json') {
       var obj = {};
@@ -372,7 +378,7 @@
     return null;
   };
 
-  // parses the JSON string and adds proper classes depending on item type
+  // parses the JSON string and adds proper classes (and converts some values) depending on item type
   function JSONsyntaxHighlight(json) {
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
@@ -388,14 +394,20 @@
 
           // determine the class and match
           if (unquoted === strUndefined) {
+
             cls = UNDEFINED_CLASS;
             match = 'undefined';
+
           } else if (unquoted === strCircularRef) {
+
             cls = CIRCULAR_REF_CLASS;
             match = fromLogeeString(strCircularRef);
+
           } else if (unquoted.startsWith(strRegex)) {
+
             cls = REGEXP_CLASS;
             match = unquoted.replace(strRegex, '');
+
           } else {
             cls = STRING_CLASS;
           }
