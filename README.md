@@ -7,14 +7,16 @@ Custom methods fallback to `console.log` in the browser console.
 
 #### Examples
 
-`console.log` outputs each argument on a new line, coloring it based on its type.
+`console.log` outputs each argument on a new line, coloring it based on its type. For instance:
 
-![Console Log](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/console-log.png)
+`console.log(1, 'str', null, undefined, false);`
+
+Displays the following in the Logee Box:
+
 ![Logee Log](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-log.png)
 
-Other methods concatenate the arguments and print them on a single line, with the appropriate method color. For instance:
+Other methods concatenate the arguments and print them on a single line, with the appropriate method color. Using the same example:
 
-![Console Info](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/console-info.png)
 ![Logee Info](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-info.png)
 
 All methods that behave like `console.info`:
@@ -23,7 +25,7 @@ All methods that behave like `console.info`:
 
 Outputing a json can be done using `console.json`. A special string `_self_` is logged in case of a circular reference.
 
-![Console Json](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-json.png)
+![Log Json](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-json.png)
 
 
 ## Methods
@@ -51,11 +53,18 @@ All you have to do is include JS and CSS files on your page and Logee does the r
 <script src="logee.js" type="text/javascript"></script>
 
 <!-- ... rest of your page -->
+
 <script>
-	console.log('Log String', 1234, /abcd/g); // displays each argument on a new line, colored by its type
-	console.warning('This', 'is', 'an', 'info', 'msg'); // concatenates all arguments and displays them as a single-spaced, orange, string
-	console.json({name: 'Nemanja', age: 123 }); // displayed a full json with syntax highlighting
-	// ...
+
+	// displays each argument on a new line, colored by its type
+	console.log('Log String', 1234, true); 
+
+	// concatenates all arguments and displays them as a single-spaced, orange, string
+	console.warning('This', 'is', 'an', 'info', 'msg'); 
+
+	// displays a full json with syntax highlighting
+	console.json({name: 'Nemanja', age: 123 });
+
 </script>
 ```
 
