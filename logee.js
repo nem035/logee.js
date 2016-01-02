@@ -1,5 +1,5 @@
 /* ========================================================================
- * logee.js v0.2.1
+ * logee.js v0.3.0
  * https://github.com/nem035/logee.js
  * ========================================================================
  * Copyright 2015 Nemanja Stojanovic
@@ -147,33 +147,48 @@
     return Array.prototype.indexOf.call(elem.classList, c) !== -1;
   }
 
+  // set the title attribute of an element
+  function setTitle(elem, t) {
+    elem.setAttribute('title', t);
+  }
+
+  // set the HTML content of an element
+  function setHTML(elem, h) {
+    elem.innerHTML = h;
+  }
+
   // ========== Constants ========== //
 
-  var LOGEE_ID            = '__logee',      // prefix to all DOM identifiers (classes and ids)
+  var LOGEE_ID                = '__logee',            // prefix to all DOM identifiers (classes and ids)
       
-      CONTAINER_ID        = 'container',    // id for the Logee container
-      CONTAINER_CLASS     = 'container',    // class for the Logee container
+      CONTAINER_ID            = 'container',          // id for the Logee container
+      CONTAINER_CLASS         = 'container',          // class for the Logee container
 
-      HEADER_CLASS        = 'header',       // class for the Logee header
-      HEADER_LABEL_CLASS  = 'header-label', // class for the header label
-      HEADER_BTN_CLASS    = 'header-btn',   // class for all buttons in the header
+      HEADER_LABEL            = 'Logee',              // text displayed in the header
+      HEADER_CLASS            = 'header',             // class for the Logee header
+      HEADER_LABEL_CLASS      = 'header-label',       // class for the header label
+      HEADER_BTN_CLASS        = 'header-btn',         // class for all buttons in the header
 
-      ZOOM_BTNS_CLASS     = 'zoom-btns',    // class for the zoom buttons wrapper in the header
+      TOGGLE_HEIGHT_BTN_CLASS = 'toggle-height-btn',  // class for the Toggle Height button
+      TOGGLE_HEIGHT_BTN_DESC  = 'Toggle HEight',      // description for the Toggle Height button
 
-      PLUS_BTN_CLASS      = 'plus-btn',     // class for the Plus button
-      PLUS_BTN_LABEL      = '+',            // label for the Plus button
-      
-      MINUS_BTN_CLASS     = 'minus-btn',    // class for the Minus button
-      MINUS_BTN_LABEL     = '-',            // label for the Minus button
-      
-      CLEAR_BTN_CLASS     = 'clear-btn',    // class for the Clear button
-      CLEAR_BTN_LABEL     = 'Clear',        // label for the Clear button
-      
-      HEADER_LABEL        = 'Logee',        // text displayed in the header
-      
-      BODY_CLASS          = 'body',         // class for the Logee Box body
+      ZOOM_BTNS_CLASS         = 'zoom-btns',          // class for the zoom buttons wrapper in the header
 
-      DRAG_CLASS          = 'draggable',    // class added to the container when dragging
+      PLUS_BTN_CLASS          = 'plus-btn',           // class for the Plus button
+      PLUS_BTN_LABEL          = '+',                  // label for the Plus button
+      PLUS_BTN_DESC           = 'Increase Font Size', // description of the clear button
+      
+      MINUS_BTN_CLASS         = 'minus-btn',          // class for the Minus button
+      MINUS_BTN_LABEL         = '-',                  // label for the Minus button      
+      MINUS_BTN_DESC          = 'Decrease Font Size', // description of the clear button
+      
+      CLEAR_BTN_CLASS         = 'clear-btn',          // class for the Clear button
+      CLEAR_BTN_LABEL         = 'Clear',              // label for the Clear button
+      CLEAR_BTN_DESC          = 'Clear Console',      // description of the clear button
+
+      BODY_CLASS              = 'body',               // class for the Logee Box body
+
+      DRAG_CLASS              = 'draggable',          // class added to the container when dragging
 
       // CSS classes for different data types
       NUMBER_CLASS        = 'number',           
@@ -192,18 +207,19 @@
 
   // ========== Setup variables ========== //
 
-  var containerDim      = 300,                        // height and width of the Logee container
-      containerPadding  = 2,                          // padding of the Logee container
-      headerHeight      = 25,                         // height of the Logee header is 10% of the container height
-      headerPadding     = 5,                          // padding of the Loggee header
-      fontSize          = 14,                         // font size for the Logee body
-      maxFontSize       = 17,                         // maximum font size for the Logee body
-      minFontSize       = 11,                         // minimum font size for the Logee body
-      jsonSpacing       = 2,                          // number of spacing for JSON.stringify
-      strUndefined      = toLogeeString('undefined'), // string to represent undefined value
-      strRegex          = toLogeeString('regex'),     // string to represent a regular expression
-      strCircularRef    = toLogeeString('_self_'),    // string to represent a circular reference
-      strEmpty          = '""';                       // string to represent an empty string
+  var containerDim      = 300,                                                // height and width of the Logee container
+      containerPadding  = 2,                                                  // padding of the Logee container
+      headerHeight      = 25,                                                 // height of the Logee header is 10% of the container height
+      headerPadding     = 5,                                                  // padding of the Loggee header
+      bodyHeight        = containerDim - 2 * containerPadding - headerHeight, // calculate the height of the Logee body
+      fontSize          = 14,                                                 // font size for the Logee body
+      maxFontSize       = 17,                                                 // maximum font size for the Logee body
+      minFontSize       = 11,                                                 // minimum font size for the Logee body
+      jsonSpacing       = 2,                                                  // number of spacing for JSON.stringify
+      strUndefined      = toLogeeString('undefined'),                         // string to represent undefined value
+      strRegex          = toLogeeString('regex'),                             // string to represent a regular expression
+      strCircularRef    = toLogeeString('_self_'),                            // string to represent a circular reference
+      strEmpty          = '""';                                               // string to represent an empty string
       
   // ========== Control variables ========== //
 
@@ -212,6 +228,7 @@
       header,                     // Logee Box header
       headerLabel,                // header label
       body,                       // Logee Box body
+      toggleHeightBtn,                // toggleHeight button in the header
       zoomBtns,                   // container for the zoom buttons,
       plusBtn,                    // plus button in the header
       minusBtn,                   // minus button in the header
@@ -401,7 +418,9 @@
       } else if (/null/.test(match)) {
         cls = NULL_CLASS;
       }
-      return '<span class="' + (cls === JSON_KEY_CLASS ? '' : toLogeeString(JSON_PROP_CLASS)) + ' ' + toLogeeString(cls) + '">' + match + '</span>';
+      return '<span class="' + 
+             (cls === JSON_KEY_CLASS ? '' : toLogeeString(JSON_PROP_CLASS)) + 
+             ' ' + toLogeeString(cls) + '">' + match + '</span>';
     });
   };
 
@@ -439,7 +458,7 @@
     
     if (type == 'json') {
     
-      msg.innerHTML = JSONsyntaxHighlight(JSONstringify(message));
+      setHTML(msg, JSONsyntaxHighlight(JSONstringify(message)));
     
     } else {
 
@@ -464,6 +483,7 @@
   // function that creates a new console.log method and saves the original one (or its fallback) 
   function createMethod(name, method) {
     
+    // store the old console method
     oldConsole[name] = console[name] || oldConsole['log']; // all custom methods fallback to console.log
     
     console[name] = function() {
@@ -481,8 +501,10 @@
         // create the dom element containing the current message
         var msg = createLogeeMessage(name);
 
+        // log each argument for the particular method
         logIt(msg, args, name);
 
+        // append logee message to the dom
         appendLogeeMessage(msg);
       }
       
@@ -505,7 +527,7 @@
   };
 
   function clearIt() {
-    body.innerHTML = '';
+    setHTML(body, '');
     msgCount = 0;
   };
 
@@ -516,7 +538,8 @@
     container = createElem('div');
     setId(container, CONTAINER_ID);
     addClass(container, CONTAINER_CLASS);
-    setDimensions(container, containerDim, true); // pass true to enforce the dimensions
+    setWidth(container, containerDim, true);
+    // setDimensions(container, containerDim, true); // pass true to enforce the dimensions
     setPadding(container, containerPadding);
 
     // prepend the container element to the body
@@ -531,6 +554,25 @@
     addListener(header, 'mouseup', resetDrag);
     append(container, header);
 
+    // create a clear button in the header
+    toggleHeightBtn = createElem('div');
+    addClass(toggleHeightBtn, HEADER_BTN_CLASS);
+    addClass(toggleHeightBtn, TOGGLE_HEIGHT_BTN_CLASS);
+
+    appendText(toggleHeightBtn, '-');
+    toggleHeightBtn.onclick = function() {
+      if(parseInt(body.style.height) === 0) {
+        setHeight(body, bodyHeight, true);
+        setHTML(toggleHeightBtn, '-');
+        setTitle(toggleHeightBtn, 'Minimize');
+      } else {
+        setHeight(body, 0, true);
+        setHTML(toggleHeightBtn, '+');
+        setTitle(toggleHeightBtn, 'Maximize');
+      }
+    };
+    append(header, toggleHeightBtn);
+
     // create the label in the header
     headerLabel = createElem('span');
     addClass(headerLabel, HEADER_LABEL_CLASS);
@@ -541,6 +583,7 @@
     clearBtn = createElem('div');
     addClass(clearBtn, HEADER_BTN_CLASS);
     addClass(clearBtn, CLEAR_BTN_CLASS);
+    setTitle(clearBtn, CLEAR_BTN_DESC);
     appendText(clearBtn, CLEAR_BTN_LABEL);
     clearBtn.onclick = function() {
       console.clear();
@@ -556,6 +599,7 @@
     plusBtn = createElem('div');
     addClass(plusBtn, HEADER_BTN_CLASS);
     addClass(plusBtn, PLUS_BTN_CLASS);
+    setTitle(plusBtn, PLUS_BTN_DESC);
     appendText(plusBtn, PLUS_BTN_LABEL);
     plusBtn.onclick = function() {
       if(fontSize <= maxFontSize) {
@@ -568,6 +612,7 @@
     minusBtn = createElem('div');
     addClass(minusBtn, HEADER_BTN_CLASS);
     addClass(minusBtn, MINUS_BTN_CLASS);
+    setTitle(minusBtn, MINUS_BTN_DESC);
     appendText(minusBtn, MINUS_BTN_LABEL);
     minusBtn.onclick = function() {
       if(fontSize >= minFontSize) {
@@ -579,7 +624,7 @@
     // create Logee Box body
     body = createElem('div');
     addClass(body, BODY_CLASS);
-    setHeight(body, containerDim - 2 * containerPadding - headerHeight, true);
+    setHeight(body, bodyHeight, true);
     body.style.fontSize = pixelize(fontSize);
     append(container, body);
 

@@ -1,5 +1,5 @@
 /* ========================================================================
- * logee.css v0.2.1
+ * logee.css v0.3.0
  * https://github.com/nem035/logee.js
  * ========================================================================
  * Copyright 2015 Nemanja Stojanovic
@@ -10,6 +10,7 @@
 
 .__logee-container {
   background: #37474f;
+  box-shadow: 1px 1px 10px 1px black;
   color: #eceff1;
   border: 1px solid #263238;
   border-radius: 3px;
@@ -67,6 +68,17 @@
 
 .__logee-container .__logee-header .__logee-clear-btn {
   padding: 2px;
+}
+
+
+.__logee-container .__logee-header .__logee-toggle-height-btn {
+  background: transparent;
+  border-width: 0; 
+  float: left;
+  margin: 0px 0px 5px 0px;
+  color: white;
+  font-weight: bold;
+  font-size: 1em;
 }
 
 /* Body */
