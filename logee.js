@@ -2,7 +2,7 @@
  * logee.js v0.3.0
  * https://github.com/nem035/logee.js
  * ========================================================================
- * Copyright 2015 Nemanja Stojanovic
+ * Copyright 2015-2016 Nemanja Stojanovic
  * Licensed under MIT (https://github.com/nem035/logee.js/blob/master/LICENSE)
  * ======================================================================== */
  
@@ -228,7 +228,7 @@
       header,                     // Logee Box header
       headerLabel,                // header label
       body,                       // Logee Box body
-      toggleHeightBtn,                // toggleHeight button in the header
+      toggleHeightBtn,            // toggleHeight button in the header
       zoomBtns,                   // container for the zoom buttons,
       plusBtn,                    // plus button in the header
       minusBtn,                   // minus button in the header
@@ -558,7 +558,6 @@
     toggleHeightBtn = createElem('div');
     addClass(toggleHeightBtn, HEADER_BTN_CLASS);
     addClass(toggleHeightBtn, TOGGLE_HEIGHT_BTN_CLASS);
-
     appendText(toggleHeightBtn, '-');
     toggleHeightBtn.onclick = function() {
       if(parseInt(body.style.height) === 0) {
@@ -639,5 +638,6 @@
     // create custom console methods
     createMethod('success');
     createMethod('json');
+
   });
 })(window);

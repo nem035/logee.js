@@ -60,7 +60,7 @@ All you have to do is include JS and CSS files on your page and Logee does the r
 	console.log('Log String', 1234, true); 
 
 	// concatenates all arguments and displays them as a single-spaced, orange, string
-	console.warning('This', 'is', 'an', 'info', 'msg'); 
+	console.warn('This', 'is', 'an', 'info', 'msg'); 
 
 	// displays a full json with syntax highlighting
 	console.json({name: 'Nemanja', age: 123 });
