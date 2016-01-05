@@ -1,6 +1,6 @@
 # LogeeJS 
 
-LogeeJS is a plain JavaScript library that extends the [console API](https://developer.chrome.com/devtools/docs/console-api) and allows basic logging without openning the browser console.
+LogeeJS is a plain JavaScript library (only **5.6K**) that extends the [console API](https://developer.chrome.com/devtools/docs/console-api) and allows basic logging without openning the browser console.
 
 All existing console methods behave as they do in the browser console, with additional UI logs in a small draggable box.
 Custom methods fallback to `console.log` in the browser console.
@@ -48,9 +48,16 @@ Outputing a json can be done using `console.json`. A special string `_self_` is 
 
 All you have to do is include JS and CSS files on your page and Logee does the rest.
 
+You can use the direct raw github link:
+
+	`https://github.com/nem035/logee.js/blob/master/logee.min.js`
+	`https://github.com/nem035/logee.js/blob/master/logee.min.css`
+
+ or download the css/js files yourself.
+
 ```html
-<link href="logee.css" rel="stylesheet" type="text/css"/>
-<script src="logee.js" type="text/javascript"></script>
+<link href="logee.min.css" rel="stylesheet" type="text/css"/>
+<script src="logee.min.js" type="text/javascript"></script>
 
 <!-- ... rest of your page -->
 
