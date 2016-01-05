@@ -236,7 +236,7 @@
 
   // initialized
   var oldConsole    = {},               // object that will contain original global.console methods
-      console       = global.console,   // global.console alias
+      _console      = global.console,   // global.console alias
       isDragged     = false,            // flag indicating if the container is being dragged
       dragOffsetY   = 0,                // vertical offset when dragging the container
       dragOffsetX   = 0,                // horizontal offset when dragging the container
@@ -284,6 +284,9 @@
 
   // convert arguments to a single spaced string message
   function argsToString(args) {
+    if(!isArray(args)) {
+      args = toArray(args);
+    }
     return args.map(function(a) {
       if (a === null) {
         return 'null';
@@ -324,15 +327,14 @@
     if(isObject(item)) {
       for (var prop in item) {
         // dont iterate over properties on the prototype chain
-        if(item.hasOwnProperty(prop)) {
+        if(toType(item.hasOwnProperty) === 'function' && item.hasOwnProperty(prop)) {
           cb(item[prop], prop);
         }
       }
     } else if(isArrayLike(item)) {
-      if(!isArray(item)) {
-        item = toArray(item);
+      for(var i = 0, l = item.length; i < l; i++) {
+        cb(item[i], i, item);
       }
-      item.forEach(cb);
     } else {
       throw new Error('Argument is not iterable');
     }
@@ -359,10 +361,19 @@
   };
 
   // converts the item into an appropriate JSON string
-  function JSONstringify(item) {
+  function logeeStringify(item) {
+
+    var obj;
+    
     if (toType(JSON) === 'json') {
-      var obj = {};
-      convertCircRefs(item, item, obj);
+
+      obj = {};
+      if(toType(item) === 'object') {
+        convertCircRefs(item, item, obj);
+      } else {
+        obj = item;
+      }
+
       return JSON.stringify(obj, function(key, value) {
         
         if (value === void 0) {
@@ -376,14 +387,19 @@
         return value;
       }, jsonSpacing);
     }
+
     return null;
   };
 
   // parses the JSON string and adds proper classes (and converts some values) depending on item type
   function JSONsyntaxHighlight(json) {
+    
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+      
       var cls = NUMBER_CLASS;
+      
       // if starts with a double quote
       if (/^"/.test(match)) {
         // if ends with a colon
@@ -418,10 +434,19 @@
       } else if (/null/.test(match)) {
         cls = NULL_CLASS;
       }
+
       return '<span class="' + 
              (cls === JSON_KEY_CLASS ? '' : toLogeeString(JSON_PROP_CLASS)) + 
              ' ' + toLogeeString(cls) + '">' + match + '</span>';
     });
+  };
+
+  // uses built in text parsing methods to protect against code injection
+  function toSafeString(s) {
+    var elem = createElem('div');
+    var text = createText(s);
+    append(elem, text);
+    return elem.innerHTML;
   };
 
   // creates a log message div with proper id and classes
@@ -451,85 +476,118 @@
 
   // formats and adds a message div to the container body
   function createLogeeMessageNode(message, type) {
+    
     // init the msg text container 
-    var msg = createElem('div');
+    var msgDiv = createElem('div');
 
     // add create the DOM message content
     
-    if (type == 'json') {
+    if (message === '') { // make empty string more visible by displaying empty quotes
+       
+        message = strEmpty;
+        addClass(msgDiv, EMPTY_CLASS);
+      
+    } else if (type == 'json') {
     
-      setHTML(msg, JSONsyntaxHighlight(JSONstringify(message)));
+      message = JSONsyntaxHighlight(logeeStringify(message));
     
     } else {
 
-      if (message === '') { // make empty string more visible by displaying empty quotes
-       
-        message = strEmpty;
-        addClass(msg, EMPTY_CLASS);
-      
-      } else if(type === 'log') { // if performing a regular log, add data type class
-        
-        addClass(msg, toType(message));
-      
+      if(type === 'log') { // if performing a regular log, add data type class
+        addClass(msgDiv, toType(message));
       } 
       
-      append(msg, createText(message));
+      message = toSafeString(message);
 
     }
 
-    return msg;
+    setHTML(msgDiv, message);
+
+    return msgDiv;
   };
 
   // function that creates a new console.log method and saves the original one (or its fallback) 
   function createMethod(name, method) {
     
     // store the old console method
-    oldConsole[name] = console[name] || oldConsole['log']; // all custom methods fallback to console.log
+    oldConsole[name] = _console[name] || oldConsole['log']; // all custom methods fallback to console.log
     
-    console[name] = function() {
-      
-      // call the particular log method
-      if(name === 'clear') {
-      
-        clearIt();
-      
-      } else {
+    _console[name] = function() {
 
-        // convert the arguments of the console function to an array
-        var args = toArray(arguments);
+      // call the api method
+      API.execute(name, arguments);
 
-        // create the dom element containing the current message
-        var msg = createLogeeMessage(name);
-
-        // log each argument for the particular method
-        logIt(msg, args, name);
-
-        // append logee message to the dom
-        appendLogeeMessage(msg);
-      }
-      
       // call the old console method or its fallback, if they exist
-      if (oldConsole[name]) oldConsole[name].apply(console, arguments);
+      if (oldConsole[name]) {
+        oldConsole[name].apply(_console, arguments);
+      }
     }
   };
 
   // ========== API Methods ========== //
 
-  function logIt(msg, args, type) {
-    if(type === 'log' || type === 'json') {
-      each(args, function(a) {
-        append(msg, createLogeeMessageNode(a, type));
-      });
-    } else {
-      append(msg, createLogeeMessageNode(argsToString(args), type));
+  var singleLineMethods = ['info', 'debug', 'warn', 'error', 'success'];
+  var multiLineMethods = ['log', 'json'];
+  var methods = ['clear'].concat(singleLineMethods.concat(multiLineMethods));
+
+  // initialize undefined methods, if there are any
+  each(methods, function(m) {
+    if(toType(_console[m]) === 'undefined') {
+      _console[m] = function () { };
     }
-     
+  });
+
+  var API = {
+
+    execute: function(methodName, args) {
+
+      if(methodName === 'clear') {
+
+        this.clear();
+
+      } else {
+
+        // create appropriate dom msg div
+        var msg = createLogeeMessage(methodName);
+
+        // TODO:
+        // if the first argument is a string and there are more than 1 arguments, parse/replace the formatters 
+        // if(arguments.length > 1 && toType(arguments[0]) === 'string') {
+
+        // }
+
+        if(multiLineMethods.indexOf(methodName) !== -1) {
+          this.multiLineLog(msg, args, methodName);
+        } else {
+          this.singleLineLog(msg, args, methodName);
+        }
+
+        // append logee message to the dom
+        appendLogeeMessage(msg);
+      }
+    },
+
+    singleLineLog: function(msg, args, methodName) {
+      append(msg, createLogeeMessageNode(argsToString(args), methodName));
+    },
+
+    multiLineLog: function(msg, args, methodName) {
+      each(args, function(a) {
+        append(msg, createLogeeMessageNode(a, methodName));
+      });
+    },
+
+    clear: function() {
+      setHTML(body, '');
+      msgCount = 0;
+    }
+
   };
 
-  function clearIt() {
-    setHTML(body, '');
-    msgCount = 0;
-  };
+  // create API methods
+  each(methods, function(name) {
+    createMethod(name);
+  });
 
   // make sure Logee loads after the DOM
   addListener(document, 'DOMContentLoaded', function() {
@@ -585,7 +643,7 @@
     setTitle(clearBtn, CLEAR_BTN_DESC);
     appendText(clearBtn, CLEAR_BTN_LABEL);
     clearBtn.onclick = function() {
-      console.clear();
+      _console.clear();
     };
     append(header, clearBtn);
 
@@ -626,18 +684,6 @@
     setHeight(body, bodyHeight, true);
     body.style.fontSize = pixelize(fontSize);
     append(container, body);
-
-    // enhance existing console methods
-    createMethod('log');
-    createMethod('info');
-    createMethod('debug');
-    createMethod('warn');
-    createMethod('error');
-    createMethod('clear');
-
-    // create custom console methods
-    createMethod('success');
-    createMethod('json');
 
   });
 })(window);
