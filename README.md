@@ -50,8 +50,8 @@ All you have to do is include JS and CSS files on your page and Logee does the r
 
 You can use the direct raw github link:
 
-	`https://github.com/nem035/logee.js/blob/master/logee.min.js`
-	`https://github.com/nem035/logee.js/blob/master/logee.min.css`
+	https://github.com/nem035/logee.js/blob/master/logee.min.js
+	https://github.com/nem035/logee.js/blob/master/logee.min.css
 
  or download the css/js files yourself.
 
@@ -68,6 +68,9 @@ You can use the direct raw github link:
 
 	// concatenates all arguments and displays them as a single-spaced, orange, string
 	console.warn('This', 'is', 'an', 'info', 'msg'); 
+
+	// clear the console and the Logee Box
+	console.clear();
 
 	// displays a full json with syntax highlighting
 	console.json({name: 'Nemanja', age: 123 });
