@@ -50,8 +50,8 @@ All you have to do is include JS and CSS files on your page and Logee does the r
 
 You can use the direct raw github link:
 
-	https://github.com/nem035/logee.js/blob/master/logee.min.js
-	https://github.com/nem035/logee.js/blob/master/logee.min.css
+        https://raw.githubusercontent.com/nem035/logee.js/master/logee.min.js
+	https://raw.githubusercontent.com/nem035/logee.js/master/logee.min.css
 
  or download the css/js files yourself.
 
