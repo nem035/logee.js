@@ -597,7 +597,6 @@
     setId(container, CONTAINER_ID);
     addClass(container, CONTAINER_CLASS);
     setWidth(container, containerDim, true);
-    // setDimensions(container, containerDim, true); // pass true to enforce the dimensions
     setPadding(container, containerPadding);
 
     // prepend the container element to the body
