@@ -1,41 +1,52 @@
-/* ========================================================================
- * logee.css v0.3.0
- * https://github.com/nem035/logee.js
- * ========================================================================
- * Copyright 2015-2016 Nemanja Stojanovic
- * Licensed under MIT (https://github.com/nem035/logee.js/blob/master/LICENSE)
- * ======================================================================== */
-
-/* Main container */
+/**
+ * logee.js - JavaScript library for loging in the browser without opening the browser console.
+ * @version v0.3.0
+ * @author Nemanja Stojanovic
+ * @link https://github.com/nem035/logee.js#readme
+ * @license MIT
+ */
+/* max z index */
+.__logee-container .__logee-header, .__logee-container .__logee-footer {
+  position: absolute;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  padding: 2px;
+}
 
 .__logee-container {
-  background: #37474f;
+  background: #004d40;
   box-shadow: 1px 1px 10px 1px black;
   color: #eceff1;
   border: 1px solid #263238;
   border-radius: 3px;
   position: fixed;
-  z-index: 2147483647;     /* max z index */
+  z-index: 2147483647;
   opacity: 0.99;
-  font-family:  monospace;
+  font-family: monospace;
+  width: 300px;
+  height: 300px;
 }
 
-/* Header */
+.__logee-container.__logee-draggable {
+  border: 1px dashed #00bfa5;
+}
+
+.__logee-container.__logee-resizable {
+  border: 1px dashed #00bfa5;
+}
 
 .__logee-container .__logee-header {
-  border-bottom: 1px solid #263238;
-  padding: 0px 2px 2px 0px !important;
-  box-shadow: 0px 2px 10px 0px #263238;
+  height: 9%;
   cursor: move;
-  font-size: 1em;
-  font-weight: bold;
-  text-align: center; 
+  top: 0;
 }
 
 .__logee-container .__logee-header .__logee-header-label {
   font-size: 1.2em;
   float: left;
-  margin-left: 5px; 
+  margin-left: 5px;
 }
 
 .__logee-container .__logee-header .__logee-header-btn {
@@ -56,11 +67,11 @@
   box-shadow: inset 1px 1px 5px 1px #263238;
 }
 
-.__logee-header .__logee-zoom-btns {
+.__logee-container .__logee-header .__logee-zoom-btns {
   float: right;
 }
 
-.__logee-header .__logee-zoom-btns  .__logee-header-btn {
+.__logee-container .__logee-header .__logee-zoom-btns .__logee-header-btn {
   padding: 1px 6px;
   margin-right: 5px;
   border-radius: 50px;
@@ -70,10 +81,9 @@
   padding: 2px;
 }
 
-
 .__logee-container .__logee-header .__logee-toggle-height-btn {
   background: transparent;
-  border-width: 0; 
+  border-width: 0;
   float: left;
   margin: 0px 0px 5px 0px;
   color: white;
@@ -81,31 +91,29 @@
   font-size: 1em;
 }
 
-/* Body */
-
 .__logee-container .__logee-body {
-  box-shadow: inset 2px 2px 10px 3px #263238;
-  overflow-y: scroll;
+  background: #263238;
+  position: absolute;
+  height: 86%;
+  top: 9%;
+  bottom: 5%;
+  box-shadow: 1px 1px 5px 1px black inset !important;
+  overflow: scroll;
   font-family: monospace;
+  font-size: 14px;
   width: 100%;
 }
 
 .__logee-container .__logee-body .__logee-msg {
   border-bottom: 1px solid #455a64;
   padding: 7px 5px;
-  overflow-x: scroll;
   opacity: 0;
+  -webkit-transition: opacity 0.15s linear;
   transition: opacity 0.15s linear;
   white-space: pre;
+  /* Message types */
+  /* Data types */
 }
-
-/* Other */
-
-.__logee-draggable {
-  border: 1px dashed #eceff1;
-}
-
-/* Message types */
 
 .__logee-container .__logee-body .__logee-msg.__logee-msg-log {
   color: #eceff1;
@@ -135,18 +143,21 @@
   margin: 0;
 }
 
-/* Data types */
+.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-circ-ref {
+  color: yellow;
+  font-style: italic;
+}
 
 .__logee-container .__logee-body .__logee-msg .__logee-string {
   color: #76ff03;
 }
 
 .__logee-container .__logee-body .__logee-msg .__logee-number {
-  color: #18ffff
+  color: #18ffff;
 }
 
 .__logee-container .__logee-body .__logee-msg .__logee-boolean {
-  color: #40c4ff
+  color: #40c4ff;
 }
 
 .__logee-container .__logee-body .__logee-msg .__logee-null,
@@ -163,12 +174,38 @@
   font-style: italic;
 }
 
-/* JSON message */
-
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-json-key {
+.__logee-container .__logee-footer {
+  height: 5%;
+  bottom: 0;
 }
 
-.__logee-container .__logee-body .__logee-msg.__logee-msg-json .__logee-circ-ref {
-  color: yellow;
-  font-style: italic;
+.__logee-container .__logee-footer .__logee-footer-resizer {
+  cursor: se-resize;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  right: 0;
+  bottom: 0;
+}
+
+.__logee-container .__logee-footer .__logee-footer-resizer .__logee-footer-resizer-line1 {
+  height: 12.14214px;
+  width: 12.14214px;
+  border-top: 1px solid #eceff1;
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+  position: absolute;
+  left: 3.03553px;
+  top: 3.03553px;
+}
+
+.__logee-container .__logee-footer .__logee-footer-resizer .__logee-footer-resizer-line2 {
+  height: 7.07143px;
+  width: 7.07143px;
+  border-bottom: 1px solid #eceff1;
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+  position: absolute;
+  left: 2.01786px;
+  top: 2.01786px;
 }

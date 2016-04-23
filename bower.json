@@ -11,9 +11,10 @@
   "description": "JavaScript library for visual logging.",
   "moduleType": [],
   "keywords": [
+    "logee",
+    "javascript",
     "console",
-    "log",
-    "logging"
+    "log"
   ],
   "license": "MIT",
   "ignore": [
