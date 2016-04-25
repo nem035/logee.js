@@ -24,6 +24,8 @@ This means you can plug in LogeeJS on your website and it will display your exis
 
 ### Examples
 
+#### Differently colored methods
+
 ![Logee Extended Methods](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-extended.png)
 
 #### Logging primitives
@@ -90,7 +92,7 @@ Additionally, you can :
 
 ## Options
 
-    isAttachedToConsole : true  // determines if Logee is attached to the console or has to be used independently
+    shouldAttachToConsole : true  // determines if Logee is attached to the console or has to be used independently
 
 ## Usage
 
@@ -113,9 +115,13 @@ You can use the direct raw github link:
 
 <script>
 
-    // initialize Logee
-    /* By default, Logee is attached to the console.
-       This means extended console methods log both in the browser and in the Logee box */
+	/* 
+    Initialize Logee.
+
+	  By default, Logee is attached to the browser console.
+		This means extended console methods log BOTH in the 
+		browser and in the Logee box.
+  */
 	Logee.init(); 
 
 	// displays each argument on a new line, colored by its type
@@ -144,8 +150,13 @@ You can use the direct raw github link:
 
 <script>
 
-    // initialize Logee and detach it from the console
-    /* This means extended console methods log ONLY in the browser and logging in the Logee box requires calling methods on the Logee object. */
+  /* 
+     Initialize Logee and detach it from the console.
+
+     This means extended console methods log ONLY in 
+     the browser and logging in the Logee box requires 
+     calling methods on the Logee object. 
+  */
 	Logee.init({ shouldAttachToConsole: true }); // 
 
 	// logs in the console but not in the Logee box
