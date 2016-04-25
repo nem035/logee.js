@@ -6,10 +6,10 @@ module.exports = {
 	output: {
 		path: path.join(__dirname, 'dist'),
 		publicPath: '',
-		filename: 'dev-build.js',
-		chunkFilename: '[id].bundle.js',
-		hotUpdateMainFilename: 'dev-build.js',
-		hotUpdateChunkFilename: 'dev-build.json'
+		filename: '_dev-build.js',
+		chunkFilename: '_[id].bundle.js',
+		hotUpdateMainFilename: '_dev-build.js',
+		hotUpdateChunkFilename: '_dev-build.json'
 	},
 	module: {
     loaders: [

@@ -61,13 +61,13 @@ gulp.task('minify-sass', () => {
 
 
 // JS
+const logeeDir = './src/js/logee.js';
 
 gulp.task('build-js', () => {
-const logeeDir = './src/js/logee.js';
 
   gutil.log('\n\nBuild JavaScript Paths: \n', logeeDir, '\n\n');
 
-  const bundler = browserify('./src/js/logee.js');
+  const bundler = browserify(logeeDir);
   bundler.transform(babelify);
 
   return bundler.bundle()
@@ -79,7 +79,6 @@ const logeeDir = './src/js/logee.js';
 });
 
 gulp.task('minify-js', () => {
-  const logeeDir = './src/js/logee.js';
 
   gutil.log('\n\nBuild JavaScript Paths: \n', logeeDir, '\n\n');
   
@@ -106,7 +105,7 @@ gulp.task('compile', ['compile-sass', 'compile-js']);
 gulp.task('dev-build-sass', () => {
   return gulp.src(sassDir)
    .pipe(gulpSass({outputStyle: 'expanded'}).on('error', gulpSass.logError))
-   .pipe(concat('dev-build.css'))
+   .pipe(concat('_dev-build.css'))
    .pipe(autoprefixer())
    .pipe(gulp.dest('./dist'));
 });
