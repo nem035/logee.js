@@ -13,7 +13,7 @@
 
 # LogeeJS 
 
-LogeeJS is a plain JavaScript library that extends the [console API](https://developer.chrome.com/devtools/docs/console-api) and allows basic logging without openning the browser console.
+LogeeJS is a plain JavaScript library that extends the [console API](https://developer.mozilla.org/en-US/docs/Web/API/Console) and allows basic logging without openning the browser console.
 
 ### Summary
 
@@ -51,9 +51,9 @@ let obj = {
   	name: 'Hi, I am nested'
   }
 };
-o['Self Reference'] = o;
+obj['Self Reference'] = obj;
 
-console.log(o);
+console.log(obj);
 ```
 
 ![Logee object log](https://raw.githubusercontent.com/nem035/logee.js/master/screenshots/logee-object.png)
