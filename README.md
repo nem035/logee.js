@@ -1,12 +1,12 @@
 
-		_                           
-		| |                          
-		| |     ___   __ _  ___  ___ 
-		| |    / _ \ / _` |/ _ \/ _ \
-		| |___| (_) | (_| |  __/  __/
-		|______\___/ \__, |\___|\___|
-		              __/ |          
-		             |___/           
+		 _                             ___ _____ 
+		| |                           |_  /  ___|
+		| |     ___   __ _  ___  ___    | \ `--. 
+		| |    / _ \ / _` |/ _ \/ _ \   | |`--. \
+		| |___| (_) | (_| |  __/  __/\__/ /\__/ /
+		\_____/\___/ \__, |\___|\___\____/\____/ 
+		              __/ |                      
+		             |___/                             
 
 
 **NOTE: This is still a work in progress. The functionality was tested in the latest Chrome & Firefox but proper testing is yet to be included.**
@@ -36,7 +36,7 @@ console.log(1, 'str', null, undefined, false)
 
 #### Logging Objects 
 
-```
+```js
 var obj = {
   "String": "foo",
   "Number": 123456,
@@ -122,7 +122,7 @@ You can use the direct raw github link:
 	console.log('Log String', 1234, true); 
 
 	// displays each argument on a new line, colored in orange
-	console.warn('This', 'is', 'an', 'info', 'msg'); 
+	console.warn('This', 'is', 'a', 'warning', 'msg'); 
 
 	// clear the console and the Logee box
 	console.clear();
