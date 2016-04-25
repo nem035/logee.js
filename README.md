@@ -18,7 +18,7 @@ LogeeJS is a plain JavaScript library that extends the [console API](https://dev
 ### Summary
 
 LogeeJS generates a dragable & resizable box on top of your page that shows styled log messages.
-All existing console methods behave as they do in the browser console, with some of them showing logs in the Logee box as well. Custom methods provided by LogeeJS fallback to `console.log` in the browser console.
+All existing console methods behave as they do in the browser console, with some of them showing logs in the Logee box as well. Methods that do not exist on the console object fallback to [console.log](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) in the browser console.
 
 This means you can plug in LogeeJS on your website and it will display your existing logs without any changes to the code. 
 
@@ -39,7 +39,7 @@ console.log(1, 'str', null, undefined, false)
 #### Logging Objects 
 
 ```js
-var obj = {
+let obj = {
   "String": "foo",
   "Number": 123456,
   "Boolean": true,
@@ -65,9 +65,9 @@ A special string `_self_` is logged in case of a circular reference.
 
 Logee box header contains:
 
-- a button to clear the console, 
-- two buttons to increase/decrease the font size
-- a button to minimize/maximize Logee box
+- A button to clear the console, 
+- Two buttons to increase/decrease the font size
+- A button to minimize/maximize Logee box
 
 Additionally, you can :
 
@@ -78,16 +78,16 @@ Additionally, you can :
 ## Methods
 
 ##### Extended
-* [console.log](https://developer.chrome.com/devtools/docs/console-api#consolelog)
-* [console.info](https://developer.chrome.com/devtools/docs/console-api#consoleinfo)
-* [console.debug](https://developer.chrome.com/devtools/docs/console-api#consoledebug)
-* [console.warn](https://developer.chrome.com/devtools/docs/console-api#consolewarn)
-* [console.error](https://developer.chrome.com/devtools/docs/console-api#consoleerror)
-* [console.clear](https://developer.chrome.com/devtools/docs/console-api#consoleclear)
+* [console.log](https://developer.mozilla.org/en-US/docs/Web/API/Console/log)
+* [console.info](https://developer.mozilla.org/en-US/docs/Web/API/Console/info)
+* console.debug
+* [console.warn](https://developer.mozilla.org/en-US/docs/Web/API/Console/warn)
+* [console.error](https://developer.mozilla.org/en-US/docs/Web/API/Console/error)
+* console.clear
 
 ##### Custom
 * **console.success** 
-	* *logs in green color (falls back to [console.log](https://developer.chrome.com/devtools/docs/console-api#consolelog) in the browser console)*
+	* *logs in green color (falls back to [console.log](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) in the browser console)*
 
 
 ## Options
@@ -157,7 +157,7 @@ You can use the direct raw github link:
      the browser and logging in the Logee box requires 
      calling methods on the Logee object. 
   */
-	Logee.init({ shouldAttachToConsole: true }); // 
+	Logee.init({ shouldAttachToConsole: false }); // 
 
 	// logs in the console but not in the Logee box
 	console.log('something'); 
