@@ -94,16 +94,22 @@ Additionally, you can :
 
     shouldAttachToConsole : true  // determines if Logee is attached to the console or has to be used independently
 
-## Usage
+## Installation
 
-All you have to do is include JS and CSS files on your page and LogeeJS does the rest.
+All you have to do is include `logee.min.js` and `logee.min.css` files on your page and LogeeJS does the rest.
 
-You can use the direct raw github link:
+#### Bower
 
-    https://raw.githubusercontent.com/nem035/logee.js/master/dist/logee.min.css
-    https://raw.githubusercontent.com/nem035/logee.js/master/dist/logee.min.js
+    bower install logee
 
- or download the css/js files yourself.
+#### Rawgit
+	
+    https://rawgit.com/nem035/logee.js/master/dist/logee.min.css
+    https://rawgit.com/nem035/logee.js/master/dist/logee.min.js
+
+#### Manual
+
+ Download [logee.min.js](https://raw.githubusercontent.com/nem035/logee.js/master/dist/logee.min.js) and [logee.min.css](https://raw.githubusercontent.com/nem035/logee.js/master/dist/logee.min.css) yourself.
 
 #### Example 1
 
