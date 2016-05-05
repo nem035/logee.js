@@ -27,6 +27,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/nem035/logee.js.git"
-  },
-  "private": true
+  }
 }
